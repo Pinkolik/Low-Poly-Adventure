@@ -132,7 +132,7 @@ void mainLoop(GLFWwindow *window) {
     processInput(window);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.use();
     texture.active();
@@ -167,6 +167,7 @@ int main() {
     GLFWwindow *window = createWindow();
     initGlad();
     glViewport(0, 0, WIDTH, HEIGHT);
+    glEnable(GL_DEPTH_TEST);
 
     mainLoop(window);
   } catch (const std::exception &e) {

@@ -4,10 +4,10 @@
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
       mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
-  position = position;
-  worldUp = up;
-  yaw = yaw;
-  pitch = pitch;
+  this->position = position;
+  this->worldUp = up;
+  this->yaw = yaw;
+  this->pitch = pitch;
   updateCameraVectors();
 }
 
@@ -15,15 +15,15 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY,
                float upZ, float yaw, float pitch)
     : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
       mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
-  position = glm::vec3(posX, posY, posZ);
-  worldUp = glm::vec3(upX, upY, upZ);
-  yaw = yaw;
-  pitch = pitch;
+  this->position = glm::vec3(posX, posY, posZ);
+  this->worldUp = glm::vec3(upX, upY, upZ);
+  this->yaw = yaw;
+  this->pitch = pitch;
   updateCameraVectors();
 }
 
 glm::mat4 Camera::getViewMatrix() {
-  return glm::lookAt(position, position + front, up);
+  return glm::lookAt(position, position + front, worldUp);
 }
 
 float Camera::getZoom() { return zoom; }
@@ -58,7 +58,6 @@ void Camera::processMouseMovement(float xOffset, float yOffset) {
   }
 
   updateCameraVectors();
-  std::cout << "Pitch: " << pitch << "; Yaw: " << yaw << std::endl;
 }
 
 void Camera::processMouseScroll(float yOffset) {
@@ -72,12 +71,11 @@ void Camera::processMouseScroll(float yOffset) {
 }
 
 void Camera::updateCameraVectors() {
-  glm::vec3 front;
-  front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  front.y = sin(glm::radians(pitch));
-  front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  front = glm::normalize(front);
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  front = glm::normalize(direction);
 
   right = glm::normalize(glm::cross(front, worldUp));
-  up = glm::normalize(glm::cross(right, front));
 }
