@@ -18,6 +18,8 @@ add_executable(Game
                 src/helpers/shader.cpp
                 src/helpers/texture.h
                 src/helpers/texture.cpp
-                src/helpers/stb_image.h)
+                src/helpers/stb_image.h
+                src/helpers/camera.h
+                src/helpers/camera.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
