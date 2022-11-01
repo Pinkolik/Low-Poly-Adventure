@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 add_subdirectory(glfw)
 add_subdirectory(glm)
 
-add_executable(Game src/main.cpp src/glad.c)
+file(COPY resources/shaders resources/textures DESTINATION resources)
+
+add_executable(Game src/main.cpp src/glad.c src/helpers/shader.h src/helpers/shader.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
