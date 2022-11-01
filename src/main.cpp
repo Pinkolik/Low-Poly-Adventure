@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 // Helpers
 #include "helpers/shader.h"
+#include "helpers/texture.h"
 #include <exception>
 #include <iostream>
 #include <stdexcept>
@@ -40,13 +41,14 @@ void initGlad() {
 void mainLoop(GLFWwindow *window) {
   Shader shader = Shader("./resources/shaders/vShader.glsl",
                          "./resources/shaders/fShader.glsl");
+  Texture texture = Texture("./resources/textures/wall.jpg");
 
-  float vertices[] = {-0.5f, -0.5f, 0.0f,  // lower left
-                      -0.5f, 0.5f,  0.0f,  // upper left
-                      0.5f,  0.5f,  0.0f,  // upper right
-                      0.5f,  -0.5f, 0.0f}; // lower right
-  unsigned int indices[] = {0, 1, 2,       // fisrt triangle
-                            2, 3, 0};      // second triangle
+  float vertices[] = {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // lower left
+                      -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,  // upper left
+                      0.5f,  0.5f,  0.0f, 1.0f, 1.0f,  // upper right
+                      0.5f,  -0.5f, 0.0f, 1.0f, 0.0f}; // lower right
+  unsigned int indices[] = {0, 1, 2,                   // fisrt triangle
+                            2, 3, 0};                  // second triangle
 
   unsigned int VAO, VBO, EBO;
 
@@ -63,14 +65,20 @@ void mainLoop(GLFWwindow *window) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   while (!glfwWindowShouldClose(window)) {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.use();
+    texture.active();
+    shader.setInt("tex", 0);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
