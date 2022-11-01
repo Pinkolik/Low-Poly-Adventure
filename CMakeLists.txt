@@ -4,6 +4,7 @@ project(Game)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 
 add_subdirectory(glfw)
 add_subdirectory(glm)
