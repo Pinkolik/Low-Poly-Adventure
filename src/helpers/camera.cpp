@@ -67,7 +67,6 @@ void Camera::processMouseScroll(float yOffset) {
   } else if (zoom > 45.0f) {
     zoom = 45.0f;
   }
-  std::cout << "Zoom: " << zoom << std::endl;
 }
 
 void Camera::updateCameraVectors() {

@@ -20,6 +20,8 @@ add_executable(Game
                 src/helpers/texture.cpp
                 src/helpers/stb_image.h
                 src/helpers/camera.h
-                src/helpers/camera.cpp)
+                src/helpers/camera.cpp
+                src/helpers/model.h
+                src/helpers/model.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
