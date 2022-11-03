@@ -41,6 +41,20 @@
             "scale": [2.0, 1.0, 5.0],
             "translate": [0.0, 1.0, 0.0],
             "rotate": [0.0, 0.0, 0.0]
+        },
+        {
+            "model": "coral_cube",
+            "scaleTex": [1.0, 1.0],
+            "scale": [0.5, 0.5, 0.5],
+            "translate": [0.0, -0.75, 0.0],
+            "rotate": [0.0, 0.0, 0.0]
+        },
+        {
+            "model": "white_cube",
+            "scaleTex": [1.0, 1.0],
+            "scale": [0.1, 0.1, 0.1],
+            "translate": [0.0, 0.0, 0.0],
+            "rotate": [0.0, 0.0, 0.0]
         }
     ]
 }

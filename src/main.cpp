@@ -120,7 +120,7 @@ void mainLoop(GLFWwindow *window) {
     glm::mat4 view = camera.getViewMatrix();
     shader.setMatrix4f("view", view);
 
-    map.draw(&shader);
+    map.draw(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

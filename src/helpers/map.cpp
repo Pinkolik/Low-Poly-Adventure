@@ -32,7 +32,7 @@ Map::Map(const char *mapPath) {
   }
 }
 
-void Map::draw(Shader *shader) {
+void Map::draw(Shader &shader) {
 
   for (auto info : modelInfos) {
     glm::mat4 modelMat = glm::mat4(1);
@@ -47,7 +47,7 @@ void Map::draw(Shader *shader) {
         glm::rotate(modelMat, glm::radians(info.rotate[2]), glm::vec3(0, 0, 1));
     modelMat = glm::scale(
         modelMat, glm::vec3(info.scale[0], info.scale[1], info.scale[2]));
-    shader->setMatrix4f("model", modelMat);
-    info.model->draw();
+    shader.setMatrix4f("model", modelMat);
+    info.model->draw(shader);
   }
 }

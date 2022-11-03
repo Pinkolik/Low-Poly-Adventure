@@ -13,7 +13,8 @@ public:
   void setBool(const std::string &name, bool value);
   void setInt(const std::string &name, int value);
   void setFloat(const std::string &name, float value);
-  void setMatrix4f(const std::string &name, const glm::mat4 &matrix);
+  void setMatrix4f(const std::string &name, const glm::mat4 &value);
+  void setVec3f(const std::string &name, const glm::vec3 &value);
 
 private:
   unsigned int ID;

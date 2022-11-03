@@ -14,7 +14,7 @@ struct ModelInfo {
 class Map {
 public:
   Map(const char *mapPath);
-  void draw(Shader *shader);
+  void draw(Shader &shader);
 
 private:
   std::vector<ModelInfo> modelInfos;

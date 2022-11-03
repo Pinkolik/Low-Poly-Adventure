@@ -1,5 +1,6 @@
 #include "model.h"
 #include "texture.h"
+#include <cstddef>
 #include <fstream>
 #include <glad/glad.h>
 #include <iostream>
@@ -15,19 +16,28 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
   std::ifstream jFile(modelPath);
   json jObj = json::parse(jFile);
 
-  std::string texPath = "./resources/textures/" + std::string(jObj["texture"]);
-  Texture *jTexture = new Texture(texPath.c_str());
-  texture = jTexture;
   std::vector<float> jVertices = jObj["vertices"];
 
-  int i = 0;
-  for (auto it = jVertices.begin(); it != jVertices.end(); it++) {
-    if (i == 3) {
-      *it *= scaleTexX;
-    } else if (i == 4) {
-      *it *= scaleTexY;
+  hasTexture = !jObj["texture"].is_null();
+  if (hasTexture) {
+    std::string texPath =
+        "./resources/textures/" + std::string(jObj["texture"]);
+    Texture *jTexture = new Texture(texPath.c_str());
+    texture = jTexture;
+    int i = 0;
+    for (auto it = jVertices.begin(); it != jVertices.end(); it++) {
+      if (i == 3) {
+        *it *= scaleTexX;
+      } else if (i == 4) {
+        *it *= scaleTexY;
+      }
+      i = (i + 1) % 5;
     }
-    i = (i + 1) % 5;
+  }
+  hasColor = !jObj["color"].is_null();
+  if (hasColor) {
+    std::vector<float> jColor = jObj["color"];
+    color = jColor;
   }
 
   glGenVertexArrays(1, &VAO);
@@ -39,17 +49,31 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
   glBufferData(GL_ARRAY_BUFFER, jVertices.size() * sizeof(float),
                jVertices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
+  if (hasTexture) {
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-  verticesSize = jVertices.size() / 5;
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                          (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    verticesSize = jVertices.size() / 5;
+  } else {
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
+    verticesSize = jVertices.size() / 3;
+  }
 }
 
-void Model::draw() {
-  texture->active();
+void Model::draw(Shader &shader) {
+  if (hasTexture) {
+    shader.setBool("hasColor", false);
+    texture->active();
+  } else if (hasColor) {
+    shader.setBool("hasColor", true);
+    shader.setVec3f("color", glm::vec3(color[0], color[1], color[2]));
+  }
   glBindVertexArray(VAO);
   glDrawArrays(GL_TRIANGLES, 0, verticesSize);
 }
