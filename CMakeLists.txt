@@ -22,6 +22,8 @@ add_executable(Game
                 src/helpers/camera.h
                 src/helpers/camera.cpp
                 src/helpers/model.h
-                src/helpers/model.cpp)
+                src/helpers/model.cpp
+                src/helpers/map.h
+                src/helpers/map.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)

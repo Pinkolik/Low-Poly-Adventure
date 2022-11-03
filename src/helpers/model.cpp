@@ -9,14 +9,15 @@
 
 using json = nlohmann::json;
 
+Model::Model(std::string modelPath) { Model(modelPath.c_str()); }
+
 Model::Model(const char *modelPath) {
   std::ifstream jFile(modelPath);
   json jObj = json::parse(jFile);
 
-  std::string texPath =
-      std::string("./resources/textures/") + std::string(jObj["texture"]);
-  Texture jTexture = Texture(texPath.c_str());
-  texture = &jTexture;
+  std::string texPath = "./resources/textures/" + std::string(jObj["texture"]);
+  Texture *jTexture = new Texture(texPath.c_str());
+  texture = jTexture;
   std::vector<float> jVertices = jObj["vertices"];
 
   glGenVertexArrays(1, &VAO);
@@ -25,7 +26,8 @@ Model::Model(const char *modelPath) {
   glBindVertexArray(VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, jVertices.size() * sizeof(float), jVertices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, jVertices.size() * sizeof(float),
+               jVertices.data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);

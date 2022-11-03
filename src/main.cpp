@@ -4,13 +4,14 @@
 #include <GLFW/glfw3.h>
 // Helpers
 #include "helpers/camera.h"
+#include "helpers/map.h"
 #include "helpers/model.h"
 #include "helpers/shader.h"
 #include "helpers/texture.h"
 // GLM
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/fwd.hpp>
 // C++
 #include <exception>
 #include <iostream>
@@ -64,7 +65,7 @@ GLFWwindow *createWindow() {
   glfwSetFramebufferSizeCallback(window, resizeCallback);
   glfwSetScrollCallback(window, scrollCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
-  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   return window;
 }
 
@@ -97,7 +98,7 @@ void mainLoop(GLFWwindow *window) {
   Shader shader = Shader("./resources/shaders/vShader.glsl",
                          "./resources/shaders/fShader.glsl");
   Texture texture = Texture("./resources/textures/wall.jpg");
-  Model model = Model("./resources/models/wall.json");
+  Map map = Map("./resources/maps/map1.json");
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -120,13 +121,7 @@ void mainLoop(GLFWwindow *window) {
     glm::mat4 view = camera.getViewMatrix();
     shader.setMatrix4f("view", view);
 
-    glm::mat4 modelMat = glm::mat4(1);
-    modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, -3.0f));
-    modelMat = glm::rotate(modelMat, currentFrame * glm::radians(20.0f),
-                           glm::vec3(1, 0, 0));
-    shader.setMatrix4f("model", modelMat);
-
-    model.draw();
+    map.draw(&shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
