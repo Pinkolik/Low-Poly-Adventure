@@ -20,10 +20,6 @@
 const int WIDTH = 1600;
 const int HEIGHT = 900;
 
-// timing
-float deltaTime = 0.0f; // time between current frame and last frame
-float lastFrame = 0.0f;
-
 Camera camera = Camera();
 
 void resizeCallback(GLFWwindow *window, int width, int height) {
@@ -75,22 +71,22 @@ void initGlad() {
   }
 }
 
-void processInput(GLFWwindow *window) {
+void processInput(GLFWwindow *window, float deltaTime, Camera *camera) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.processKeyboard(FORWARD, deltaTime);
+    camera->processKeyboard(FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.processKeyboard(BACKWARD, deltaTime);
+    camera->processKeyboard(BACKWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.processKeyboard(LEFT, deltaTime);
+    camera->processKeyboard(LEFT, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.processKeyboard(RIGHT, deltaTime);
+    camera->processKeyboard(RIGHT, deltaTime);
   }
 }
 
@@ -100,12 +96,15 @@ void mainLoop(GLFWwindow *window) {
   Texture texture = Texture("./resources/textures/wall.jpg");
   Map map = Map("./resources/maps/map1.json");
 
+  // timing
+  float deltaTime = 0.0f; // time between current frame and last frame
+  float lastFrame = 0.0f;
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    processInput(window);
+    processInput(window, deltaTime, &camera);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
