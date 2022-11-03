@@ -6,7 +6,7 @@
 
 class Model {
 public:
-  Model(std::string modelPath);
+  Model(const char *modelPath, float scaleTexX, float scaleTexY);
   Model(const char *modelPath);
   void draw();
 

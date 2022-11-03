@@ -17,8 +17,8 @@
 #include <iostream>
 #include <stdexcept>
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1600;
+const int HEIGHT = 900;
 
 // timing
 float deltaTime = 0.0f; // time between current frame and last frame

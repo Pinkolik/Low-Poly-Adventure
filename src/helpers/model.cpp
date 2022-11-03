@@ -9,9 +9,9 @@
 
 using json = nlohmann::json;
 
-Model::Model(std::string modelPath) { Model(modelPath.c_str()); }
+Model::Model(const char *modelPath) : Model(modelPath, 1.0f, 1.0f) {}
 
-Model::Model(const char *modelPath) {
+Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
   std::ifstream jFile(modelPath);
   json jObj = json::parse(jFile);
 
@@ -19,6 +19,16 @@ Model::Model(const char *modelPath) {
   Texture *jTexture = new Texture(texPath.c_str());
   texture = jTexture;
   std::vector<float> jVertices = jObj["vertices"];
+
+  int i = 0;
+  for (auto it = jVertices.begin(); it != jVertices.end(); it++) {
+    if (i == 3) {
+      *it *= scaleTexX;
+    } else if (i == 4) {
+      *it *= scaleTexY;
+    }
+    i = (i + 1) % 5;
+  }
 
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
