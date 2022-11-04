@@ -1,6 +1,6 @@
 #include "camera.h"
-#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
@@ -26,6 +26,8 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY,
 glm::mat4 Camera::getViewMatrix() {
   return glm::lookAt(position, position + front, worldUp);
 }
+
+glm::vec3 Camera::getPosition() { return position; }
 
 float Camera::getZoom() { return zoom; }
 

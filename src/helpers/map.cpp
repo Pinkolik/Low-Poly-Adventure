@@ -53,6 +53,7 @@ void Map::draw(Camera &camera, float aspect) {
       glm::vec3(lightInfos[0].translate[0], lightInfos[0].translate[1],
                 lightInfos[0].translate[2]);
   defaultShader->setVec3f("lightPos", lightPos);
+  defaultShader->setVec3f("viewPos", camera.getPosition());
   for (auto info : modelInfos) {
     glm::mat4 modelMat = getModelMat(info);
     defaultShader->setMatrix4f("model", modelMat);
