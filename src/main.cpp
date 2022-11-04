@@ -91,9 +91,6 @@ void processInput(GLFWwindow *window, float deltaTime, Camera *camera) {
 }
 
 void mainLoop(GLFWwindow *window) {
-  Shader shader = Shader("./resources/shaders/vShader.glsl",
-                         "./resources/shaders/fShader.glsl");
-  Texture texture = Texture("./resources/textures/wall.jpg");
   Map map = Map("./resources/maps/map1.json");
 
   // timing
@@ -109,18 +106,7 @@ void mainLoop(GLFWwindow *window) {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    shader.use();
-    shader.setInt("tex", 0);
-
-    glm::mat4 projection =
-        glm::perspective(glm::radians(camera.getZoom()),
-                         (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-    shader.setMatrix4f("projection", projection);
-
-    glm::mat4 view = camera.getViewMatrix();
-    shader.setMatrix4f("view", view);
-
-    map.draw(shader);
+    map.draw(camera, (float)WIDTH / (float)HEIGHT);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
