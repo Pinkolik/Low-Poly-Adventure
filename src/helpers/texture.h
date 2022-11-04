@@ -5,7 +5,7 @@ class Texture {
 public:
   Texture(const char *texturePath);
   unsigned int getId();
-  void active();
+  void active(int offset);
 
 private:
   unsigned int id;

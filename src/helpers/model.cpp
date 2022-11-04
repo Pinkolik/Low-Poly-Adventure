@@ -34,6 +34,13 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
       i = (i + 1) % 8;
     }
   }
+  hasSpecular = !jObj["specular"].is_null();
+  if (hasSpecular) {
+    std::string texPath =
+        "./resources/textures/" + std::string(jObj["specular"]);
+    Texture *jTexture = new Texture(texPath.c_str());
+    specular = jTexture;
+  }
   hasColor = !jObj["color"].is_null();
   if (hasColor) {
     std::vector<float> jColor = jObj["color"];
@@ -77,8 +84,15 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
 void Model::draw(Shader &shader) {
   if (hasTexture) {
     shader.setBool("hasColor", false);
-    texture->active();
-  } else if (hasColor) {
+    texture->active(0);
+  }
+  if (hasSpecular) {
+    shader.setBool("hasSpecular", true);
+    specular->active(1);
+  } else {
+    shader.setBool("hasSpecular", false);
+  }
+  if (hasColor) {
     shader.setBool("hasColor", true);
     shader.setVec3f("color", glm::vec3(color[0], color[1], color[2]));
   }

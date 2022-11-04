@@ -47,16 +47,14 @@ void Map::draw(Camera &camera, float aspect) {
   }
 
   defaultShader->use();
-  defaultShader->setInt("tex", 0);
+  defaultShader->setInt("material.diffuse", 0);
+  defaultShader->setInt("material.specular", 1);
+  defaultShader->setFloat("material.shininess", 32.0f);
   defaultShader->setMatrix4f("view", view);
   glm::vec3 lightPos =
       glm::vec3(lightInfos[0].translate[0], lightInfos[0].translate[1],
                 lightInfos[0].translate[2]);
   defaultShader->setVec3f("viewPos", camera.getPosition());
-  defaultShader->setVec3f("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-  defaultShader->setVec3f("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-  defaultShader->setVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-  defaultShader->setFloat("material.shininess", 32.0f);
   defaultShader->setVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
   defaultShader->setVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
   defaultShader->setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));

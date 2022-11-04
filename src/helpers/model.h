@@ -14,8 +14,10 @@ public:
 private:
   unsigned int VAO, VBO, verticesSize;
   Texture *texture;
+  Texture *specular;
   std::vector<float> color;
   bool hasTexture;
+  bool hasSpecular;
   bool hasColor;
 };
 
