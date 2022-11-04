@@ -26,12 +26,12 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
     texture = jTexture;
     int i = 0;
     for (auto it = jVertices.begin(); it != jVertices.end(); it++) {
-      if (i == 3) {
+      if (i == 6) {
         *it *= scaleTexX;
-      } else if (i == 4) {
+      } else if (i == 7) {
         *it *= scaleTexY;
       }
-      i = (i + 1) % 5;
+      i = (i + 1) % 8;
     }
   }
   hasColor = !jObj["color"].is_null();
@@ -50,19 +50,27 @@ Model::Model(const char *modelPath, float scaleTexX, float scaleTexY) {
                jVertices.data(), GL_STATIC_DRAW);
 
   if (hasTexture) {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                           (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    verticesSize = jVertices.size() / 5;
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                          (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    verticesSize = jVertices.size() / 8;
   } else {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0 * sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
-    verticesSize = jVertices.size() / 3;
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                          (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    verticesSize = jVertices.size() / 6;
   }
 }
 

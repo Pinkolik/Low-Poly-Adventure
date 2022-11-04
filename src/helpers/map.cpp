@@ -31,20 +31,10 @@ Map::Map(const char *mapPath) {
 }
 
 void Map::draw(Camera &camera, float aspect) {
-  defaultShader->use();
-  defaultShader->setInt("tex", 0);
-
   glm::mat4 projection =
       glm::perspective(glm::radians(camera.getZoom()), aspect, 0.1f, 100.0f);
   defaultShader->setMatrix4f("projection", projection);
-
   glm::mat4 view = camera.getViewMatrix();
-  defaultShader->setMatrix4f("view", view);
-  for (auto info : modelInfos) {
-    glm::mat4 modelMat = getModelMat(info);
-    defaultShader->setMatrix4f("model", modelMat);
-    info.model->draw(*defaultShader);
-  }
 
   ligthShader->use();
   ligthShader->setMatrix4f("projection", projection);
@@ -55,6 +45,25 @@ void Map::draw(Camera &camera, float aspect) {
     ligthShader->setMatrix4f("model", modelMat);
     info.model->draw(*ligthShader);
   }
+
+  defaultShader->use();
+  defaultShader->setInt("tex", 0);
+  defaultShader->setMatrix4f("view", view);
+  glm::vec3 lightPos =
+      glm::vec3(lightInfos[0].translate[0], lightInfos[0].translate[1],
+                lightInfos[0].translate[2]);
+  defaultShader->setVec3f("lightPos", lightPos);
+  for (auto info : modelInfos) {
+    glm::mat4 modelMat = getModelMat(info);
+    defaultShader->setMatrix4f("model", modelMat);
+    info.model->draw(*defaultShader);
+  }
+}
+
+void Map::tick(float time) {
+  lightInfos[0].translate[0] = 0.5 * cos(time);
+  lightInfos[0].translate[1] = -0.5 + 0.2 * sin(time * 8);
+  lightInfos[0].translate[2] = 0.5 * sin(time);
 }
 
 ModelInfo Map::parseModelInfo(nlohmann::basic_json<> jModel) {

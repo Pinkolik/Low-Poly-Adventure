@@ -20,7 +20,8 @@ private:
   unsigned int ID;
 
   unsigned int compileShader(GLenum type, std::string &shaderSourceStr);
-  unsigned int linkProgram(unsigned int vertexShader, unsigned int fragmentShader);
+  unsigned int linkProgram(unsigned int vertexShader,
+                           unsigned int fragmentShader);
 };
 
 #endif

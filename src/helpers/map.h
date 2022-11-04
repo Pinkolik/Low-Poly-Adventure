@@ -17,6 +17,7 @@ class Map {
 public:
   Map(const char *mapPath);
   void draw(Camera &camera, float aspect);
+  void tick(float time);
 
 private:
   ModelInfo parseModelInfo(nlohmann::basic_json<> jModel);
