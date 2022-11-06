@@ -1,5 +1,7 @@
 #include "map.h"
 #include "camera.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 #include "model.h"
 #include "shader.h"
 #include <fstream>
@@ -24,8 +26,8 @@ Map::Map(const char *mapPath) {
     modelInfos.push_back(info);
   }
 
-  for (auto jModel : jObj["lights"]) {
-    ModelInfo info = parseModelInfo(jModel);
+  for (auto jLight : jObj["lights"]) {
+    LightInfo info = parseLightInfo(jLight);
     lightInfos.push_back(info);
   }
 }
@@ -41,24 +43,48 @@ void Map::draw(Camera &camera, float aspect) {
   ligthShader->setMatrix4f("view", view);
   for (auto info : lightInfos) {
     glm::mat4 modelMat = glm::mat4(1);
-    modelMat = getModelMat(info);
+    modelMat = glm::translate(modelMat, info.position);
+    modelMat = glm::scale(modelMat, glm::vec3(0.1, 0.1, 0.1));
     ligthShader->setMatrix4f("model", modelMat);
+    ligthShader->setVec3f("aColor", info.specular);
     info.model->draw(*ligthShader);
   }
+
+  // glm::vec3 lightPos =
+  //     glm::vec3(lightInfos[0].translate[0], lightInfos[0].translate[1],
+  //               lightInfos[0].translate[2]);
 
   defaultShader->use();
   defaultShader->setInt("material.diffuse", 0);
   defaultShader->setInt("material.specular", 1);
   defaultShader->setFloat("material.shininess", 32.0f);
-  defaultShader->setMatrix4f("view", view);
-  glm::vec3 lightPos =
-      glm::vec3(lightInfos[0].translate[0], lightInfos[0].translate[1],
-                lightInfos[0].translate[2]);
+
+  defaultShader->setVec3f("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+  defaultShader->setVec3f("dirLight.ambient", glm::vec3(0.1, 0.1, 0.1));
+  defaultShader->setVec3f("dirLight.diffuse", glm::vec3(0.1, 0.1, 0.1));
+  defaultShader->setVec3f("dirLight.specular", glm::vec3(0.2, 0.2, 0.2));
+
+  defaultShader->setVec3f("spotLight.position",  camera.getPosition());
+  defaultShader->setVec3f("spotLight.direction", camera.getFront());
+  defaultShader->setFloat("spotLight.cutOff",   glm::cos(glm::radians(12.5f)));
+  defaultShader->setFloat("spotLight.outerCutOff",   glm::cos(glm::radians(17.5f)));
+  defaultShader->setVec3f("spotLight.ambient", glm::vec3(0.2, 0.2, 0.2));
+  defaultShader->setVec3f("spotLight.diffuse", glm::vec3(0.5, 0.5, 0.5));
+  defaultShader->setVec3f("spotLight.specular", glm::vec3(1, 1, 1));
+  int i = 0;
+  for (auto info : lightInfos) {
+    defaultShader->setFloat("pointLights["+std::to_string(i)+"].constant", info.constant);
+    defaultShader->setFloat("pointLights["+std::to_string(i)+"].linear", info.linear);
+    defaultShader->setFloat("pointLights["+std::to_string(i)+"].quadratic", info.quadratic);
+    defaultShader->setVec3f("pointLights["+std::to_string(i)+"].position", info.position);
+    defaultShader->setVec3f("pointLights["+std::to_string(i)+"].ambient", info.ambient);
+    defaultShader->setVec3f("pointLights["+std::to_string(i)+"].diffuse", info.diffuse);
+    defaultShader->setVec3f("pointLights["+std::to_string(i)+"].specular", info.specular);
+    i++;
+  }
+
   defaultShader->setVec3f("viewPos", camera.getPosition());
-  defaultShader->setVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-  defaultShader->setVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-  defaultShader->setVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-  defaultShader->setVec3f("light.position", lightPos);
+  defaultShader->setMatrix4f("view", view);
   for (auto info : modelInfos) {
     glm::mat4 modelMat = getModelMat(info);
     defaultShader->setMatrix4f("model", modelMat);
@@ -66,11 +92,7 @@ void Map::draw(Camera &camera, float aspect) {
   }
 }
 
-void Map::tick(float time) {
-  lightInfos[0].translate[0] = 0.5 * cos(time);
-  lightInfos[0].translate[1] = -0.5 + 0.2 * sin(time * 8);
-  lightInfos[0].translate[2] = 0.5 * sin(time);
-}
+void Map::tick(float time) {}
 
 ModelInfo Map::parseModelInfo(nlohmann::basic_json<> jModel) {
   ModelInfo info;
@@ -85,6 +107,28 @@ ModelInfo Map::parseModelInfo(nlohmann::basic_json<> jModel) {
   info.translate = translate;
   std::vector<float> rotate = jModel["rotate"];
   info.rotate = rotate;
+  return info;
+}
+
+LightInfo Map::parseLightInfo(nlohmann::basic_json<> jLight) {
+  LightInfo info;
+  std::vector<float> position = jLight["position"];
+  info.position = glm::vec3(position[0], position[1], position[2]);
+  float constant = jLight["constant"];
+  info.constant = constant;
+  float linear = jLight["linear"];
+  info.linear = linear;
+  float quadratic = jLight["quadratic"];
+  info.quadratic = quadratic;
+  std::vector<float> ambient = jLight["ambient"];
+  info.ambient = glm::vec3(ambient[0], ambient[1], ambient[2]);
+  std::vector<float> diffuse = jLight["diffuse"];
+  info.diffuse = glm::vec3(diffuse[0], diffuse[1], diffuse[2]);
+  std::vector<float> specular = jLight["specular"];
+  info.specular = glm::vec3(specular[0], specular[1], specular[2]);
+  std::string modelPath = "./resources/models/white_cube.json";
+  Model *model = new Model(modelPath.c_str());
+  info.model = model;
   return info;
 }
 

@@ -13,6 +13,20 @@ struct ModelInfo {
   std::vector<float> rotate;
 };
 
+struct LightInfo {
+  Model *model;
+
+  glm::vec3 position;
+
+  float constant;
+  float linear;
+  float quadratic;
+
+  glm::vec3 ambient;
+  glm::vec3 diffuse;
+  glm::vec3 specular;
+};
+
 class Map {
 public:
   Map(const char *mapPath);
@@ -21,9 +35,10 @@ public:
 
 private:
   ModelInfo parseModelInfo(nlohmann::basic_json<> jModel);
+  LightInfo parseLightInfo(nlohmann::basic_json<> jLight);
   glm::mat4 getModelMat(ModelInfo &modelInfo);
   std::vector<ModelInfo> modelInfos;
-  std::vector<ModelInfo> lightInfos;
+  std::vector<LightInfo> lightInfos;
   Shader *defaultShader;
   Shader *ligthShader;
 };

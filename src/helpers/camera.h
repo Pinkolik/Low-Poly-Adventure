@@ -25,6 +25,8 @@ public:
 
   glm::vec3 getPosition();
 
+  glm::vec3 getFront();
+
   float getZoom();
 
   void processKeyboard(CameraMovement direction, float deltaTime);

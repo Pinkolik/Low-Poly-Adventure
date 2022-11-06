@@ -29,6 +29,8 @@ glm::mat4 Camera::getViewMatrix() {
 
 glm::vec3 Camera::getPosition() { return position; }
 
+glm::vec3 Camera::getFront() { return front; }
+
 float Camera::getZoom() { return zoom; }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
