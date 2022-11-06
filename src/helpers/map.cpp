@@ -96,17 +96,17 @@ void Map::tick(float time) {}
 
 ModelInfo Map::parseModelInfo(nlohmann::basic_json<> jModel) {
   ModelInfo info;
-  std::string modelName = std::string(jModel["model"]);
-  std::string modelPath = "./resources/models/" + modelName + ".json";
-  std::vector<float> scaleTex = jModel["scaleTex"];
-  Model *model = new Model(modelPath.c_str(), scaleTex[0], scaleTex[1]);
-  info.model = model;
-  std::vector<float> scale = jModel["scale"];
-  info.scale = scale;
-  std::vector<float> translate = jModel["translate"];
-  info.translate = translate;
-  std::vector<float> rotate = jModel["rotate"];
-  info.rotate = rotate;
+  // std::string modelName = std::string(jModel["model"]);
+  // std::string modelPath = "./resources/models/" + modelName + ".json";
+  // std::vector<float> scaleTex = jModel["scaleTex"];
+  // Model *model = new Model(modelPath.c_str(), scaleTex[0], scaleTex[1]);
+  // info.model = model;
+  // std::vector<float> scale = jModel["scale"];
+  // info.scale = scale;
+  // std::vector<float> translate = jModel["translate"];
+  // info.translate = translate;
+  // std::vector<float> rotate = jModel["rotate"];
+  // info.rotate = rotate;
   return info;
 }
 

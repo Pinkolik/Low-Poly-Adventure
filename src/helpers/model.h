@@ -1,24 +1,29 @@
 #ifndef MODEL_H
 #define MODEL_H
+#include "mesh.h"
 #include "shader.h"
 #include "texture.h"
+#include <assimp/scene.h>
 #include <string>
 #include <vector>
 
 class Model {
 public:
-  Model(const char *modelPath, float scaleTexX, float scaleTexY);
-  Model(const char *modelPath);
+  Model(const char *path);
   void draw(Shader &shader);
 
 private:
-  unsigned int VAO, VBO, verticesSize;
-  Texture *texture;
-  Texture *specular;
-  std::vector<float> color;
-  bool hasTexture;
-  bool hasSpecular;
-  bool hasColor;
+  // model data
+  std::vector<Mesh> meshes;
+  std::string directory;
+  std::vector<Texture> loadedTextures; 
+
+  void loadModel(std::string path);
+  void processNode(aiNode *node, const aiScene *scene);
+  Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+  std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
+                                            std::string typeName);
+  unsigned int loadTextureFromFile(const char *path);
 };
 
 #endif

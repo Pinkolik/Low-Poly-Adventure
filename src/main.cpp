@@ -91,8 +91,9 @@ void processInput(GLFWwindow *window, float deltaTime, Camera *camera) {
 }
 
 void mainLoop(GLFWwindow *window) {
-  Map map = Map("./resources/maps/map1.json");
-
+  Model model = Model("./resources/models/backpack/backpack.obj");
+  Shader shader = Shader("./resources/shaders/vShader.glsl",
+                         "./resources/shaders/fShader.glsl");
   // timing
   float deltaTime = 0.0f; // time between current frame and last frame
   float lastFrame = 0.0f;
@@ -106,8 +107,20 @@ void mainLoop(GLFWwindow *window) {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    map.tick(currentFrame);
-    map.draw(camera, (float)WIDTH / (float)HEIGHT);
+    shader.use();
+    glm::mat4 projection =
+        glm::perspective(glm::radians(camera.getZoom()),
+                         (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+    shader.setMatrix4f("projection", projection);
+
+    glm::mat4 view = camera.getViewMatrix();
+    shader.setMatrix4f("view", view);
+
+    glm::mat4 modelMat = glm::mat4(1);
+    modelMat = glm::translate(modelMat, glm::vec3(0));
+    shader.setMatrix4f("model", modelMat);
+
+    model.draw(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
