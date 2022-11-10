@@ -1,8 +1,14 @@
 #include "model.h"
+#include "assimp/material.h"
+#include "assimp/metadata.h"
+#include "assimp/types.h"
+#include <sstream>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <iomanip>
+#include <iostream>
 #include <stdexcept>
 
 Model::Model(const char *path) { loadModel(path); }
@@ -15,13 +21,23 @@ void Model::draw(Shader &shader) {
 
 void Model::loadModel(std::string path) {
   Assimp::Importer importer;
-  const aiScene *scene =
-      importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+  const aiScene *scene = importer.ReadFile(
+      path, aiProcess_Triangulate | aiProcess_TransformUVCoords);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       !scene->mRootNode) {
     throw std::runtime_error(importer.GetErrorString());
   }
+  unsigned int len = scene->mMetaData->mNumProperties;
+  for (unsigned int i = 0; i < len; i++) {
+    aiMetadataEntry entry = scene->mMetaData->mValues[i];
+    aiMetadataType type = entry.mType;
+    aiString key = scene->mMetaData->mKeys[i];
+    std::cout << "Key: " << key.C_Str() << " Type: " << type << std::endl;
+  }
+  float factor;
+  scene->mMetaData->Get("UnitScaleFactor", factor);
+  std::cout << "Scale factor: " << factor << std::endl;
   directory = path.substr(0, path.find_last_of('/'));
 
   processNode(scene->mRootNode, scene);
@@ -80,6 +96,22 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
   // process material
   if (mesh->mMaterialIndex >= 0) {
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+    for (unsigned int j = 0; j < material->mNumProperties; j++) {
+      aiMaterialProperty *property = material->mProperties[j];
+      unsigned int length = property->mDataLength;
+      std::stringstream dataStream;
+      for (unsigned int k = 0; k < length; k++) {
+        dataStream << (0xff & (unsigned int)property->mData[k]) << " ";
+      }
+      std::cout << "Key: " << property->mKey.data
+                << " Type: " << property->mType
+                << " Index: " << property->mIndex
+                << " Semantic: " << property->mSemantic
+                << " Data Length: " << length << " Data: " << dataStream.str()
+                << std::endl;
+    }
+    aiUVTransform transform;
+    material->Get(AI_MATKEY_UVTRANSFORM_DIFFUSE(0), transform);
     std::vector<Texture> diffuseMaps = loadMaterialTextures(
         material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -98,6 +130,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
   for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
     aiString str;
     mat->GetTexture(type, i, &str);
+    mat->Get(AI_MATKEY_NAME, str);
     bool skip = false;
     for (unsigned int j = 0; j < loadedTextures.size(); j++) {
       if (std::strcmp(loadedTextures[j].path.data(), str.C_Str()) == 0) {
@@ -119,7 +152,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat,
 }
 
 unsigned int Model::loadTextureFromFile(const char *path) {
-  stbi_set_flip_vertically_on_load(true);
+  // stbi_set_flip_vertically_on_load(true);
   std::string filename = std::string(path);
   filename = directory + '/' + filename;
 

@@ -61,7 +61,7 @@ GLFWwindow *createWindow() {
   glfwSetFramebufferSizeCallback(window, resizeCallback);
   glfwSetScrollCallback(window, scrollCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   return window;
 }
 
@@ -91,7 +91,7 @@ void processInput(GLFWwindow *window, float deltaTime, Camera *camera) {
 }
 
 void mainLoop(GLFWwindow *window) {
-  Model model = Model("./resources/models/backpack/backpack.obj");
+  Model model = Model("./resources/models/mall/mall.glb");
   Shader shader = Shader("./resources/shaders/vShader.glsl",
                          "./resources/shaders/fShader.glsl");
   // timing
