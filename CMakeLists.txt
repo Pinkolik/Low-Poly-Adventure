@@ -8,7 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 
 add_subdirectory(glfw)
 add_subdirectory(glm)
-add_subdirectory(assimp)
 
 # file(COPY resources/shaders resources/textures DESTINATION resources)
 
@@ -28,5 +27,5 @@ add_executable(Game
                 src/helpers/vertex.h
                 src/helpers/mesh.h
                 src/helpers/mesh.cpp)
-target_link_libraries(Game PUBLIC glfw glm assimp)
+target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
