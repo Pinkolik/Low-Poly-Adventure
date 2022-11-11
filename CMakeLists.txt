@@ -16,16 +16,11 @@ add_executable(Game
                 src/glad.c
                 src/helpers/shader.h
                 src/helpers/shader.cpp
-                src/helpers/texture.h
                 src/helpers/stb_image.h
+                src/helpers/stb_image_write.h
+                src/helpers/json.hpp
+                src/helpers/tiny_gltf.h
                 src/helpers/camera.h
-                src/helpers/camera.cpp
-                src/helpers/model.h
-                src/helpers/model.cpp
-                src/helpers/map.h
-                src/helpers/map.cpp
-                src/helpers/vertex.h
-                src/helpers/mesh.h
-                src/helpers/mesh.cpp)
+                src/helpers/camera.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
