@@ -29,6 +29,7 @@ void Model::draw(Shader &shader) {
 
 void Model::drawNode(Shader &shader, Node &node) {
   glm::mat4 modelMat = glm::mat4(1);
+  modelMat = glm::translate(modelMat, node.translation);
   modelMat = glm::scale(modelMat, node.scale);
   shader.setMatrix4f("model", modelMat);
   for (Primitive &primitive : node.mesh.primitives) {
@@ -41,7 +42,8 @@ void Model::drawNode(Shader &shader, Node &node) {
 }
 
 void Model::drawPrimitive(Shader &shader, Primitive &primitive) {
-  glBindTexture(GL_TEXTURE0, primitive.texture.id);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, primitive.texture.id);
   glBindVertexArray(primitive.VAO);
   glDrawElements(GL_TRIANGLES, primitive.indices.size(), GL_UNSIGNED_SHORT, 0);
 }
@@ -69,7 +71,7 @@ void Model::bufferPrimitive(Primitive &primitive) {
 
   glBindVertexArray(VAO);
 
-  glBindBuffer(GL_ARRAY_BUFFER, VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
   glBufferData(GL_ARRAY_BUFFER, primitive.vertices.size() * sizeof(Vertex),
@@ -96,7 +98,7 @@ void Model::loadModel(const char *path) {
   string err;
   string warn;
 
-  bool res = loader.LoadBinaryFromFile(&gltfModel, &err, &warn, path);
+  bool res = loader.LoadASCIIFromFile(&gltfModel, &err, &warn, path);
   if (!warn.empty()) {
     cout << "WARN: " << warn << endl;
   }
@@ -256,7 +258,8 @@ Texture Model::getTexture(tinygltf::Model &gltfModel,
   }
 
   glBindTexture(GL_TEXTURE_2D, texId);
-  glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format,
                GL_UNSIGNED_BYTE, gltfImage.image.data());
   glGenerateMipmap(GL_TEXTURE_2D);
 

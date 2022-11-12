@@ -59,7 +59,7 @@ GLFWwindow *createWindow() {
   glfwSetFramebufferSizeCallback(window, resizeCallback);
   glfwSetScrollCallback(window, scrollCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
-  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   return window;
 }
 
@@ -93,7 +93,7 @@ void mainLoop(GLFWwindow *window) {
                          "./resources/shaders/fShader.glsl");
 
   Model myModel =
-      Model("/home/pinkolik/Personal/game/resources/models/mall/mall.glb");
+      Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
   myModel.bufferModel();
 
   // timing
