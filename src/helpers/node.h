@@ -7,10 +7,11 @@
 using namespace std;
 
 struct Node {
-  vector<Mesh> meshes;
-  glm::vec4 rotation;
-  glm::vec3 scale;
-  glm::vec3 translation;
+  Mesh mesh;
+  glm::vec4 rotation = glm::vec4(0);
+  glm::vec3 scale = glm::vec3(1);
+  glm::vec3 translation = glm::vec3(0);
+  vector<Node> children;
 };
 
 #endif

@@ -21,6 +21,11 @@ add_executable(Game
                 src/helpers/json.hpp
                 src/helpers/tiny_gltf.h
                 src/helpers/camera.h
-                src/helpers/camera.cpp)
+                src/helpers/camera.cpp
+                src/helpers/mesh.h
+                src/helpers/model.cpp
+                src/helpers/model.h
+                src/helpers/node.h
+                src/helpers/primitive.h)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
