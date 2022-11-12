@@ -59,7 +59,7 @@ GLFWwindow *createWindow() {
   glfwSetFramebufferSizeCallback(window, resizeCallback);
   glfwSetScrollCallback(window, scrollCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
-  // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   return window;
 }
 
@@ -94,6 +94,7 @@ void mainLoop(GLFWwindow *window) {
 
   Model myModel =
       Model("/home/pinkolik/Personal/game/resources/models/mall/mall.glb");
+  myModel.bufferModel();
 
   // timing
   float deltaTime = 0.0f; // time between current frame and last frame
@@ -117,9 +118,7 @@ void mainLoop(GLFWwindow *window) {
     glm::mat4 view = camera.getViewMatrix();
     shader.setMatrix4f("view", view);
 
-    glm::mat4 modelMat = glm::mat4(1);
-    modelMat = glm::translate(modelMat, glm::vec3(0));
-    shader.setMatrix4f("model", modelMat);
+    myModel.draw(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
