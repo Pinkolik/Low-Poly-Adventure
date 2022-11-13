@@ -1,10 +1,8 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
-
-enum CameraMovement { FORWARD, BACKWARD, LEFT, RIGHT };
+#include <GLFW/glfw3.h>
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
@@ -12,14 +10,11 @@ const float SPEED = 25.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
-class Camera {
+class Player {
 public:
-  Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+  Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
          glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
          float pitch = PITCH);
-
-  Camera(float posX, float posY, float posZ, float upX, float upY, float upZ,
-         float yaw, float pitch);
 
   glm::mat4 getViewMatrix();
 
@@ -29,7 +24,7 @@ public:
 
   float getZoom();
 
-  void processKeyboard(CameraMovement direction, float deltaTime);
+  void processKeyboard(GLFWwindow *window, float deltaTime);
 
   void processMouseMovement(float xOffset, float yOffset);
 
@@ -48,6 +43,6 @@ private:
   float mouseSensitivity;
   float zoom;
 
-  void updateCameraVectors();
+  void updatePlayerVectors();
 };
 #endif

@@ -12,6 +12,7 @@ struct Node {
   glm::vec3 scale = glm::vec3(1);
   glm::vec3 translation = glm::vec3(0);
   vector<Node> children;
+  bool isSpawn = false;
 };
 
 #endif

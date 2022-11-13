@@ -12,6 +12,7 @@ public:
   Model(const char *path);
   void bufferModel();
   void draw(Shader &shader);
+  glm::vec3 getSpawnPos();
 
 private:
   vector<Node> nodes;

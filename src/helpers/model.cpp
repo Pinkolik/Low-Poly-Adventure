@@ -15,6 +15,16 @@
 
 Model::Model(const char *path) { loadModel(path); }
 
+glm::vec3 Model::getSpawnPos() {
+  for (Node &node : nodes) {
+    if (!node.isSpawn) {
+      continue;
+    }
+    return node.translation;
+  }
+  return glm::vec3(0);
+}
+
 void Model::bufferModel() {
   for (Node &node : nodes) {
     bufferNode(node);
@@ -23,6 +33,9 @@ void Model::bufferModel() {
 
 void Model::draw(Shader &shader) {
   for (Node &node : nodes) {
+    if (node.isSpawn) {
+      continue;
+    }
     drawNode(shader, node);
   }
 }
@@ -140,6 +153,11 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
 
   tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
   node.mesh = prcoessMesh(gltfModel, gltfMesh);
+  for (auto &primitive : node.mesh.primitives) {
+    if (primitive.texture.name.compare("spawn") == 0) {
+      node.isSpawn = true;
+    }
+  }
 
   for (size_t i = 0; i < gltfNode.children.size(); i++) {
     tinygltf::Node &gltfChildNode = gltfModel.nodes[gltfNode.children[i]];
@@ -269,6 +287,6 @@ Texture Model::getTexture(tinygltf::Model &gltfModel,
                   GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  Texture tex{texId};
+  Texture tex{texId, gltfImage.name};
   return tex;
 }

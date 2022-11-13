@@ -3,9 +3,10 @@
 // Windows initialization
 #include <GLFW/glfw3.h>
 // Helpers
-#include "helpers/camera.h"
 #include "helpers/model.h"
 #include "helpers/shader.h"
+// Engine
+#include "engine/player.h"
 // GLM
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -15,13 +16,15 @@
 #include <iostream>
 #include <stdexcept>
 
-const int WIDTH = 1600;
-const int HEIGHT = 900;
+int width = 1600;
+int height = 900;
 
-Camera camera = Camera();
+Player *player;
 
-void resizeCallback(GLFWwindow *window, int width, int height) {
-  glViewport(0, 0, width, height);
+void resizeCallback(GLFWwindow *window, int newWidth, int newHeight) {
+  glViewport(0, 0, newWidth, newHeight);
+  width = newHeight;
+  height = newHeight;
 }
 
 bool firstMouse = true;
@@ -37,11 +40,11 @@ void mouseCallback(GLFWwindow *window, double xPos, double yPos) {
   float yOffset = lastY - yPos;
   lastX = xPos;
   lastY = yPos;
-  camera.processMouseMovement(xOffset, yOffset);
+  player->processMouseMovement(xOffset, yOffset);
 }
 
 void scrollCallback(GLFWwindow *window, double xOffset, double yOffset) {
-  camera.processMouseScroll(yOffset);
+  player->processMouseScroll(yOffset);
 }
 
 GLFWwindow *createWindow() {
@@ -51,7 +54,7 @@ GLFWwindow *createWindow() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow *window =
-      glfwCreateWindow(WIDTH, HEIGHT, "Untitled Game", NULL, NULL);
+      glfwCreateWindow(width, height, "Untitled Game", NULL, NULL);
   if (window == NULL) {
     throw std::runtime_error("Failed to initialize window");
   }
@@ -69,23 +72,12 @@ void initGlad() {
   }
 }
 
-void processInput(GLFWwindow *window, float deltaTime, Camera *camera) {
+void processInput(GLFWwindow *window, float deltaTime, Player *player) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera->processKeyboard(FORWARD, deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera->processKeyboard(BACKWARD, deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera->processKeyboard(LEFT, deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera->processKeyboard(RIGHT, deltaTime);
-  }
+  player->processKeyboard(window, deltaTime);
 }
 
 void mainLoop(GLFWwindow *window) {
@@ -94,6 +86,7 @@ void mainLoop(GLFWwindow *window) {
 
   Model myModel =
       Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
+  player = new Player(myModel.getSpawnPos());
   myModel.bufferModel();
 
   // timing
@@ -104,18 +97,18 @@ void mainLoop(GLFWwindow *window) {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    processInput(window, deltaTime, &camera);
+    processInput(window, deltaTime, player);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.use();
     glm::mat4 projection =
-        glm::perspective(glm::radians(camera.getZoom()),
-                         (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+        glm::perspective(glm::radians(player->getZoom()),
+                         (float)width / (float)height, 0.1f, 100.0f);
     shader.setMatrix4f("projection", projection);
 
-    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 view = player->getViewMatrix();
     shader.setMatrix4f("view", view);
 
     myModel.draw(shader);
@@ -129,7 +122,7 @@ int main() {
   try {
     GLFWwindow *window = createWindow();
     initGlad();
-    glViewport(0, 0, WIDTH, HEIGHT);
+    glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
 
     mainLoop(window);
