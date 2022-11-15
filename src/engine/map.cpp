@@ -8,6 +8,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -32,6 +33,7 @@ void Map::bufferMap() {
   for (Node &node : nodes) {
     bufferNode(node);
   }
+  bufferDebugCube();
 }
 
 void Map::draw(Shader &shader) {
@@ -41,10 +43,12 @@ void Map::draw(Shader &shader) {
     }
     drawNode(shader, node);
   }
+  drawDebugCubes(shader);
 }
 
 glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
   vector<glm::vec3 *> intersections;
+  debugCubePoses.clear();
   for (Node &node : nodes) {
     glm::vec3 *intersection = findIntersection(node, origin, direction);
     if (intersection == NULL) {
@@ -83,7 +87,6 @@ glm::vec3 *Map::findIntersection(Primitive &primitive, glm::mat4 modelMat,
                                  glm::vec3 origin, glm::vec3 direction) {
   vector<glm::vec3 *> intersections;
   glm::mat3 normalMat = glm::inverseTranspose(modelMat);
-  primitive.debugColor = glm::vec3(0);
   for (int i = 0; i < primitive.indices.size(); i += 3) {
     glm::vec3 normal =
         normalMat * primitive.vertices[primitive.indices[i]].normal;
@@ -113,11 +116,10 @@ glm::vec3 *Map::findIntersection(Primitive &primitive, glm::mat4 modelMat,
     if (!isPointInsideTriangle(a, b, c, normal, intersection)) {
       continue;
     }
-
-    primitive.debugColor = glm::vec3(1, 0, 0);
     std::cout << "Vector coefficient " << vectorCoefficient << std::endl;
     logVector("Position", origin);
     logVector("Intersection", intersection);
+    debugCubePoses.push_back(intersection);
   }
   return NULL;
 }
@@ -154,17 +156,14 @@ void Map::drawNode(Shader &shader, Node &node) {
 }
 
 glm::mat4 Map::getModelMatForNode(Node &node) {
-  glm::mat4 modelMat = glm::mat4(1);
-  modelMat = glm::translate(modelMat, node.translation);
-  modelMat = glm::scale(modelMat, node.scale);
-  modelMat =
-      glm::rotate(modelMat, node.rotation.w,
-                  glm::vec3(node.rotation.x, node.rotation.y, node.rotation.z));
+  glm::mat4 translation = glm::translate(glm::mat4(1), node.translation);
+  glm::mat4 rotation = glm::toMat4(node.rotation);
+  glm::mat4 scale = glm::scale(glm::mat4(1), node.scale);
+  glm::mat4 modelMat = translation * rotation * scale;
   return modelMat;
 }
 
 void Map::drawPrimitive(Shader &shader, Primitive &primitive) {
-  shader.setVec3f("debugColor", primitive.debugColor);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, primitive.texture.id);
   glBindVertexArray(primitive.VAO);
@@ -251,7 +250,7 @@ Node Map::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
   vector<double> translation = gltfNode.translation;
   if (!rotation.empty()) {
     node.rotation =
-        glm::vec4(rotation[0], rotation[1], rotation[2], rotation[3]);
+        glm::quat(rotation[3], rotation[0], rotation[1], rotation[2]);
   }
   if (!scale.empty()) {
     node.scale = glm::vec3(scale[0], scale[1], scale[2]);
@@ -399,4 +398,71 @@ Texture Map::getTexture(tinygltf::Model &gltfModel,
 
   Texture tex{texId, gltfImage.name};
   return tex;
+}
+
+void Map::bufferDebugCube() {
+  unsigned int VAO, VBO, EBO;
+
+  glGenVertexArrays(1, &VAO);
+
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+  debugCube.VAO = VAO;
+  debugCube.VBO = VBO;
+  debugCube.EBO = EBO;
+
+  float vertexCoords[72] = {
+      // Front face
+      -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+
+      // Back face
+      -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
+
+      // Top face
+      -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
+
+      // Bottom face
+      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
+
+      // Right face
+      1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
+
+      // Left face
+      -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0};
+
+  unsigned short indices[36] = {
+      0,  1,  2,  0,  2,  3,  // front
+      4,  5,  6,  4,  6,  7,  // back
+      8,  9,  10, 8,  10, 11, // top
+      12, 13, 14, 12, 14, 15, // bottom
+      16, 17, 18, 16, 18, 19, // right
+      20, 21, 22, 20, 22, 23, // left
+  };
+
+  glBindVertexArray(VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+  glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(float), vertexCoords,
+               GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices,
+               GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  glBindVertexArray(0);
+}
+
+void Map::drawDebugCubes(Shader &shader) {
+  glBindVertexArray(debugCube.VAO);
+  std::cout << "drawing " << debugCubePoses.size() << " cubes" << std::endl;
+  for (glm::vec3 &cubePos : debugCubePoses) {
+    glm::mat4 translation = glm::translate(glm::mat4(1), cubePos);
+    glm::mat4 scale = glm::scale(glm::mat4(1), glm::vec3(0.1));
+    glm::mat4 modelMat = translation * scale;
+    shader.setMatrix4f("model", modelMat);
+    glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_SHORT, 0);
+  }
 }
