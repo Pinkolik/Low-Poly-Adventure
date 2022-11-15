@@ -73,3 +73,10 @@ void Player::updatePlayerVectors() {
 
   right = glm::normalize(glm::cross(front, worldUp));
 }
+
+void Player::tick(Map &map, float deltaTime) {
+  glm::vec3 down = -worldUp;
+  map.findIntersection(position, down);
+  //position -= worldUp * fallTime * GRAVITY;
+  //fallTime += deltaTime;
+}

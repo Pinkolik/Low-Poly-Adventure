@@ -11,5 +11,6 @@ struct Primitive {
   vector<Vertex> vertices;
   vector<unsigned short> indices;
   Texture texture;
+  glm::vec3 debugColor = glm::vec3(0);
 };
 #endif

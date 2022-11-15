@@ -2,11 +2,10 @@
 #include <glad/glad.h>
 // Windows initialization
 #include <GLFW/glfw3.h>
-// Helpers
-#include "helpers/model.h"
-#include "helpers/shader.h"
 // Engine
+#include "engine/map.h"
 #include "engine/player.h"
+#include "engine/shader.h"
 // GLM
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -84,10 +83,9 @@ void mainLoop(GLFWwindow *window) {
   Shader shader = Shader("./resources/shaders/vShader.glsl",
                          "./resources/shaders/fShader.glsl");
 
-  Model myModel =
-      Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
-  player = new Player(myModel.getSpawnPos());
-  myModel.bufferModel();
+  Map map = Map("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
+  player = new Player(map.getSpawnPos());
+  map.bufferMap();
 
   // timing
   float deltaTime = 0.0f; // time between current frame and last frame
@@ -97,6 +95,7 @@ void mainLoop(GLFWwindow *window) {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    player->tick(map, deltaTime);
     processInput(window, deltaTime, player);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -111,7 +110,7 @@ void mainLoop(GLFWwindow *window) {
     glm::mat4 view = player->getViewMatrix();
     shader.setMatrix4f("view", view);
 
-    myModel.draw(shader);
+    map.draw(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

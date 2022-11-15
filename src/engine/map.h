@@ -1,18 +1,19 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef MAP_H
+#define MAP_H
+#include "../helpers/tiny_gltf.h"
 #include "mesh.h"
 #include "node.h"
 #include "primitive.h"
 #include "shader.h"
-#include "tiny_gltf.h"
 #include <vector>
 
-class Model {
+class Map {
 public:
-  Model(const char *path);
-  void bufferModel();
+  Map(const char *path);
+  void bufferMap();
   void draw(Shader &shader);
   glm::vec3 getSpawnPos();
+  glm::vec3 *findIntersection(glm::vec3 origin, glm::vec3 direction);
 
 private:
   vector<Node> nodes;
@@ -29,6 +30,14 @@ private:
   void bufferPrimitive(Primitive &primitive);
   void drawNode(Shader &shader, Node &node);
   void drawPrimitive(Shader &shader, Primitive &primitive);
+  glm::vec3 *findIntersection(Node &node, glm::vec3 origin,
+                              glm::vec3 direction);
+  glm::vec3 *findIntersection(Primitive &primitive, glm::mat4 modelMat,
+                              glm::vec3 origin, glm::vec3 direction);
+  glm::mat4 getModelMatForNode(Node &node);
+  bool isPointInsideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
+                             glm::vec3 normal, glm::vec3 point);
+  void logVector(const char *prefix, glm::vec3 vec);
 };
 
 #endif

@@ -1,14 +1,16 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <glm/glm.hpp>
+#include "map.h"
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 25.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
+const float GRAVITY = 0.05;
 
 class Player {
 public:
@@ -30,6 +32,8 @@ public:
 
   void processMouseScroll(float yOffset);
 
+  void tick(Map &map, float deltaTime);
+
 private:
   glm::vec3 position;
   glm::vec3 front;
@@ -42,6 +46,7 @@ private:
   float movementSpeed;
   float mouseSensitivity;
   float zoom;
+  float fallTime;
 
   void updatePlayerVectors();
 };
