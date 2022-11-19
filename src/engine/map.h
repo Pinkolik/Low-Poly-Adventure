@@ -47,6 +47,8 @@ private:
   void logVector(const char *prefix, glm::vec3 vec);
   void bufferDebugCube();
   void drawDebugCubes(Shader &shader);
+  glm::vec3 *getMinDistanceToOriginVector(vector<glm::vec3 *> &points,
+                                          glm::vec3 origin);
 };
 
 #endif

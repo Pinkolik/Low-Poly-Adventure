@@ -1,4 +1,6 @@
 #include "player.h"
+#include "glm/geometric.hpp"
+#include "glm/trigonometric.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -14,7 +16,7 @@ Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 }
 
 glm::mat4 Player::getViewMatrix() {
-  return glm::lookAt(position, position + front, worldUp);
+  return glm::lookAt(getEyePos(), getEyePos() + front, worldUp);
 }
 
 glm::vec3 Player::getPosition() { return position; }
@@ -26,16 +28,16 @@ float Player::getZoom() { return zoom; }
 void Player::processKeyboard(GLFWwindow *window, float deltaTime) {
   float velocity = movementSpeed * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    position += front * velocity;
+    position += glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    position -= front * velocity;
+    position -= glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    position -= right * velocity;
+    position -= right * glm::vec3(1.0f, 0, 1.0f) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    position += right * velocity;
+    position += right * glm::vec3(1.0f, 0, 1.0f) * velocity;
   }
 }
 
@@ -76,7 +78,25 @@ void Player::updatePlayerVectors() {
 
 void Player::tick(Map &map, float deltaTime) {
   glm::vec3 down = -worldUp;
-  map.findIntersection(position, down);
-  //position -= worldUp * fallTime * GRAVITY;
-  //fallTime += deltaTime;
+
+  glm::vec3 afterFallPos = position + down * fallTime * GRAVITY;
+
+  glm::vec3 *intersection = map.findIntersection(position, down);
+  if (intersection == NULL) {
+    position = afterFallPos;
+    fallTime += deltaTime;
+    return;
+  }
+  float fallDistance = glm::distance(position, afterFallPos);
+  float intersectionDistance = glm::distance(position, *intersection);
+  if (intersectionDistance < fallDistance) {
+    position = *intersection;
+    fallTime = 0;
+  } else {
+    position = afterFallPos;
+    fallTime += deltaTime;
+  }
+  delete intersection;
 }
+
+glm::vec3 Player::getEyePos() { return position + worldUp; }

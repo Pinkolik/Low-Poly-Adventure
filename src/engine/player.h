@@ -7,10 +7,10 @@
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 25.0f;
+const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
-const float GRAVITY = 0.05;
+const float GRAVITY = 0.1;
 
 class Player {
 public:
@@ -48,6 +48,7 @@ private:
   float zoom;
   float fallTime;
 
+  glm::vec3 getEyePos();
   void updatePlayerVectors();
 };
 #endif

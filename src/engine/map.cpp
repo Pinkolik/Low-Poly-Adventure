@@ -2,6 +2,7 @@
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "primitive.h"
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <glad/glad.h>
@@ -56,7 +57,11 @@ glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
     }
     intersections.push_back(intersection);
   }
-  return NULL;
+  glm::vec3 *result = getMinDistanceToOriginVector(intersections, origin);
+  if (result != NULL) {
+    debugCubePoses.push_back(*result);
+  }
+  return result;
 }
 
 glm::vec3 *Map::findIntersection(Node &node, glm::vec3 origin,
@@ -80,7 +85,7 @@ glm::vec3 *Map::findIntersection(Node &node, glm::vec3 origin,
     intersections.push_back(intersection);
   }
 
-  return NULL;
+  return getMinDistanceToOriginVector(intersections, origin);
 }
 
 glm::vec3 *Map::findIntersection(Primitive &primitive, glm::mat4 modelMat,
@@ -111,17 +116,33 @@ glm::vec3 *Map::findIntersection(Primitive &primitive, glm::mat4 modelMat,
     if (vectorCoefficient < 0.f) {
       continue; // vector is behind surface
     }
-    glm::vec3 intersection = origin + vectorCoefficient * direction;
+    glm::vec3 *intersection =
+        new glm::vec3(origin + vectorCoefficient * direction);
 
-    if (!isPointInsideTriangle(a, b, c, normal, intersection)) {
+    if (!isPointInsideTriangle(a, b, c, normal, *intersection)) {
       continue;
     }
-    std::cout << "Vector coefficient " << vectorCoefficient << std::endl;
-    logVector("Position", origin);
-    logVector("Intersection", intersection);
-    debugCubePoses.push_back(intersection);
+    intersections.push_back(intersection);
   }
-  return NULL;
+  return getMinDistanceToOriginVector(intersections, origin);
+}
+
+glm::vec3 *Map::getMinDistanceToOriginVector(vector<glm::vec3 *> &points,
+                                             glm::vec3 origin) {
+  glm::vec3 *result = NULL;
+  if (points.empty()) {
+    return NULL;
+  }
+  float minDistance = MAXFLOAT;
+  for (auto point : points) {
+    float distance = glm::distance(*point, origin);
+    if (distance < minDistance) {
+      minDistance = distance;
+      delete result;
+      result = point;
+    }
+  }
+  return result;
 }
 
 bool Map::isPointInsideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
@@ -411,40 +432,31 @@ void Map::bufferDebugCube() {
   debugCube.VBO = VBO;
   debugCube.EBO = EBO;
 
-  float vertexCoords[72] = {
-      // Front face
+  float vertexCoords[24] = {
+      // front
       -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+      // back
+      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0};
 
-      // Back face
-      -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
-
-      // Top face
-      -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
-
-      // Bottom face
-      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
-
-      // Right face
-      1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
-
-      // Left face
-      -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0};
-
-  unsigned short indices[36] = {
-      0,  1,  2,  0,  2,  3,  // front
-      4,  5,  6,  4,  6,  7,  // back
-      8,  9,  10, 8,  10, 11, // top
-      12, 13, 14, 12, 14, 15, // bottom
-      16, 17, 18, 16, 18, 19, // right
-      20, 21, 22, 20, 22, 23, // left
-  };
+  unsigned short indices[36] = {// front
+                                0, 1, 2, 2, 3, 0,
+                                // right
+                                1, 5, 6, 6, 2, 1,
+                                // back
+                                7, 6, 5, 5, 4, 7,
+                                // left
+                                4, 0, 3, 3, 7, 4,
+                                // bottom
+                                4, 5, 1, 1, 0, 4,
+                                // top
+                                3, 2, 6, 6, 7, 3};
 
   glBindVertexArray(VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-  glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(float), vertexCoords,
+  glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertexCoords,
                GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices,
                GL_STATIC_DRAW);
@@ -457,12 +469,11 @@ void Map::bufferDebugCube() {
 
 void Map::drawDebugCubes(Shader &shader) {
   glBindVertexArray(debugCube.VAO);
-  std::cout << "drawing " << debugCubePoses.size() << " cubes" << std::endl;
   for (glm::vec3 &cubePos : debugCubePoses) {
     glm::mat4 translation = glm::translate(glm::mat4(1), cubePos);
     glm::mat4 scale = glm::scale(glm::mat4(1), glm::vec3(0.1));
     glm::mat4 modelMat = translation * scale;
     shader.setMatrix4f("model", modelMat);
-    glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
   }
 }
