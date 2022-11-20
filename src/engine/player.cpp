@@ -1,7 +1,9 @@
 #include "player.h"
 #include "debug_cube.h"
+#include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
+#include "utils.h"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -13,6 +15,8 @@ Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
   this->worldUp = up;
   this->yaw = yaw;
   this->pitch = pitch;
+  this->playerBox = new Node(Utils::createBoxNode());
+  playerBox->setScale(glm::vec3(0.2, 0.55, 0.2));
   updatePlayerVectors();
 }
 
@@ -97,9 +101,6 @@ void Player::tick(Map &map, float deltaTime) {
   if (intersection == NULL) {
     position = afterFallPos;
     fallTime += deltaTime;
-    DebugCube::cubes.push_back(DebugCube(position + glm::vec3(0, 0.55, 0),
-                                         glm::vec3(0.2, 0.55, 0.2),
-                                         glm::vec3(0, -yaw, 0)));
     return;
   }
   DebugCube::cubes.push_back(DebugCube(*intersection, glm::vec3(0.1)));
@@ -113,9 +114,14 @@ void Player::tick(Map &map, float deltaTime) {
     fallTime += deltaTime;
   }
   delete intersection;
-  DebugCube::cubes.push_back(DebugCube(position + glm::vec3(0, 0.55, 0),
-                                       glm::vec3(0.2, 0.55, 0.2),
-                                       glm::vec3(0, -yaw, 0)));
 }
 
 glm::vec3 Player::getEyePos() { return position + worldUp; }
+
+Node *Player::getPlayerBox() {
+  if (playerBox != NULL) {
+    playerBox->setTranslation(position + glm::vec3(0, 0.55, 0));
+    playerBox->setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
+  }
+  return playerBox;
+}

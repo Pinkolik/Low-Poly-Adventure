@@ -85,3 +85,11 @@ glm::mat4 Node::getModelMat() {
   glm::mat4 modelMat = translationMat * rotationMat * scaleMat;
   return modelMat;
 }
+
+void Node::setTranslation(glm::vec3 translation) {
+  this->translation = translation;
+}
+
+void Node::setScale(glm::vec3 scale) { this->scale = scale; }
+
+void Node::setRotation(glm::quat rotation) { this->rotation = rotation; }

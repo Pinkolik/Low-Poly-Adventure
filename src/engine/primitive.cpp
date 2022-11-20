@@ -65,14 +65,14 @@ glm::vec3 *Primitive::findIntersection(glm::mat4 modelMat, glm::vec3 origin,
 
     float surfaceDistanceFromOrigin = -glm::dot(normal, a);
     float dotNormalDirection = glm::dot(normal, direction);
-    if (dotNormalDirection == 0.f) {
+    if (dotNormalDirection == 0.0f) {
       continue; // vector is parallel to surface
     }
     float vectorCoefficient =
         -(glm::dot(normal, origin) + surfaceDistanceFromOrigin) /
         dotNormalDirection;
-    if (vectorCoefficient < 0.f) {
-      continue; // vector is behind surface
+    if (vectorCoefficient < 0.0f) {
+      continue; // vector is 0behind surface
     }
     glm::vec3 *intersection =
         new glm::vec3(origin + vectorCoefficient * direction);

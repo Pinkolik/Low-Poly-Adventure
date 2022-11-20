@@ -34,6 +34,8 @@ public:
 
   void tick(Map &map, float deltaTime);
 
+  Node *getPlayerBox();
+
 private:
   glm::vec3 position;
   glm::vec3 front;
@@ -50,6 +52,7 @@ private:
   float lastPressTime = 0;
 
   bool thirdPerson = false;
+  Node *playerBox = NULL;
 
   glm::vec3 getEyePos();
   void updatePlayerVectors();

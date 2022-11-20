@@ -120,6 +120,7 @@ void mainLoop(GLFWwindow *window) {
     for (DebugCube &cube : DebugCube::cubes) {
       cube.draw(shader);
     }
+    player->getPlayerBox()->draw(shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
