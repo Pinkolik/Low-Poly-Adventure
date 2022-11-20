@@ -3,6 +3,7 @@
 // Windows initialization
 #include <GLFW/glfw3.h>
 // Engine
+#include "engine/debug_cube.h"
 #include "engine/map.h"
 #include "engine/player.h"
 #include "engine/shader.h"
@@ -84,6 +85,7 @@ void mainLoop(GLFWwindow *window) {
                          "./resources/shaders/fShader.glsl");
 
   Map map = Map("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
+  DebugCube::init();
   player = new Player(map.getSpawnPos());
   map.bufferMap();
 
@@ -91,17 +93,19 @@ void mainLoop(GLFWwindow *window) {
   float deltaTime = 0.0f; // time between current frame and last frame
   float lastFrame = 0.0f;
   while (!glfwWindowShouldClose(window)) {
+    DebugCube::cubes.clear();
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    player->tick(map, deltaTime);
     processInput(window, deltaTime, player);
+    player->tick(map, deltaTime);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.use();
+    shader.setBool("debug", false);
     glm::mat4 projection =
         glm::perspective(glm::radians(player->getZoom()),
                          (float)width / (float)height, 0.1f, 100.0f);
@@ -111,6 +115,11 @@ void mainLoop(GLFWwindow *window) {
     shader.setMatrix4f("view", view);
 
     map.draw(shader);
+
+    shader.setBool("debug", true);
+    for (DebugCube &cube : DebugCube::cubes) {
+      cube.draw(shader);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -123,6 +132,8 @@ int main() {
     initGlad();
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     mainLoop(window);
   } catch (const std::exception &e) {

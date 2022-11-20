@@ -47,6 +47,9 @@ private:
   float mouseSensitivity;
   float zoom;
   float fallTime;
+  float lastPressTime = 0;
+
+  bool thirdPerson = false;
 
   glm::vec3 getEyePos();
   void updatePlayerVectors();

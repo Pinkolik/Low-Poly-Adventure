@@ -7,10 +7,6 @@
 #include "shader.h"
 #include <vector>
 
-struct DebugCube {
-  unsigned int VAO, VBO, EBO;
-};
-
 class Map {
 public:
   Map(const char *path);
@@ -20,8 +16,6 @@ public:
   glm::vec3 *findIntersection(glm::vec3 origin, glm::vec3 direction);
 
 private:
-  vector<glm::vec3> debugCubePoses;
-  DebugCube debugCube;
   vector<Node> nodes;
 
   void loadModel(const char *path);
@@ -45,8 +39,6 @@ private:
   bool isPointInsideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
                              glm::vec3 normal, glm::vec3 point);
   void logVector(const char *prefix, glm::vec3 vec);
-  void bufferDebugCube();
-  void drawDebugCubes(Shader &shader);
   glm::vec3 *getMinDistanceToOriginVector(vector<glm::vec3 *> &points,
                                           glm::vec3 origin);
 };

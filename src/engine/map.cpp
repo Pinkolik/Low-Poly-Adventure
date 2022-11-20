@@ -34,7 +34,6 @@ void Map::bufferMap() {
   for (Node &node : nodes) {
     bufferNode(node);
   }
-  bufferDebugCube();
 }
 
 void Map::draw(Shader &shader) {
@@ -44,12 +43,10 @@ void Map::draw(Shader &shader) {
     }
     drawNode(shader, node);
   }
-  drawDebugCubes(shader);
 }
 
 glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
   vector<glm::vec3 *> intersections;
-  debugCubePoses.clear();
   for (Node &node : nodes) {
     glm::vec3 *intersection = findIntersection(node, origin, direction);
     if (intersection == NULL) {
@@ -58,9 +55,6 @@ glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
     intersections.push_back(intersection);
   }
   glm::vec3 *result = getMinDistanceToOriginVector(intersections, origin);
-  if (result != NULL) {
-    debugCubePoses.push_back(*result);
-  }
   return result;
 }
 
@@ -419,61 +413,4 @@ Texture Map::getTexture(tinygltf::Model &gltfModel,
 
   Texture tex{texId, gltfImage.name};
   return tex;
-}
-
-void Map::bufferDebugCube() {
-  unsigned int VAO, VBO, EBO;
-
-  glGenVertexArrays(1, &VAO);
-
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  debugCube.VAO = VAO;
-  debugCube.VBO = VBO;
-  debugCube.EBO = EBO;
-
-  float vertexCoords[24] = {
-      // front
-      -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-      // back
-      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0};
-
-  unsigned short indices[36] = {// front
-                                0, 1, 2, 2, 3, 0,
-                                // right
-                                1, 5, 6, 6, 2, 1,
-                                // back
-                                7, 6, 5, 5, 4, 7,
-                                // left
-                                4, 0, 3, 3, 7, 4,
-                                // bottom
-                                4, 5, 1, 1, 0, 4,
-                                // top
-                                3, 2, 6, 6, 7, 3};
-
-  glBindVertexArray(VAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-  glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertexCoords,
-               GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices,
-               GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-  glBindVertexArray(0);
-}
-
-void Map::drawDebugCubes(Shader &shader) {
-  glBindVertexArray(debugCube.VAO);
-  for (glm::vec3 &cubePos : debugCubePoses) {
-    glm::mat4 translation = glm::translate(glm::mat4(1), cubePos);
-    glm::mat4 scale = glm::scale(glm::mat4(1), glm::vec3(0.1));
-    glm::mat4 modelMat = translation * scale;
-    shader.setMatrix4f("model", modelMat);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
-  }
 }

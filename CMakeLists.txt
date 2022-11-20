@@ -26,6 +26,8 @@ add_executable(Game
                 src/engine/node.h
                 src/engine/primitive.h
                 src/engine/player.h
-                src/engine/player.cpp)
+                src/engine/player.cpp
+                src/engine/debug_cube.cpp
+                src/engine/debug_cube.h)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)

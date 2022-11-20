@@ -1,4 +1,5 @@
 #include "player.h"
+#include "debug_cube.h"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 #include <GLFW/glfw3.h>
@@ -16,7 +17,12 @@ Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 }
 
 glm::mat4 Player::getViewMatrix() {
-  return glm::lookAt(getEyePos(), getEyePos() + front, worldUp);
+  if (thirdPerson) {
+    return glm::lookAt(getEyePos() - front * 2.0f, getEyePos() + front,
+                       worldUp);
+  } else {
+    return glm::lookAt(getEyePos(), getEyePos() + front, worldUp);
+  }
 }
 
 glm::vec3 Player::getPosition() { return position; }
@@ -26,6 +32,7 @@ glm::vec3 Player::getFront() { return front; }
 float Player::getZoom() { return zoom; }
 
 void Player::processKeyboard(GLFWwindow *window, float deltaTime) {
+  float pressTime = glfwGetTime();
   float velocity = movementSpeed * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     position += glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
@@ -38,6 +45,11 @@ void Player::processKeyboard(GLFWwindow *window, float deltaTime) {
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     position += right * glm::vec3(1.0f, 0, 1.0f) * velocity;
+  }
+  if (pressTime - lastPressTime > 0.3 &&
+      glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+    thirdPerson = !thirdPerson;
+    lastPressTime = pressTime;
   }
 }
 
@@ -85,8 +97,12 @@ void Player::tick(Map &map, float deltaTime) {
   if (intersection == NULL) {
     position = afterFallPos;
     fallTime += deltaTime;
+    DebugCube::cubes.push_back(DebugCube(position + glm::vec3(0, 0.55, 0),
+                                         glm::vec3(0.2, 0.55, 0.2),
+                                         glm::vec3(0, -yaw, 0)));
     return;
   }
+  DebugCube::cubes.push_back(DebugCube(*intersection, glm::vec3(0.1)));
   float fallDistance = glm::distance(position, afterFallPos);
   float intersectionDistance = glm::distance(position, *intersection);
   if (intersectionDistance < fallDistance) {
@@ -97,6 +113,9 @@ void Player::tick(Map &map, float deltaTime) {
     fallTime += deltaTime;
   }
   delete intersection;
+  DebugCube::cubes.push_back(DebugCube(position + glm::vec3(0, 0.55, 0),
+                                       glm::vec3(0.2, 0.55, 0.2),
+                                       glm::vec3(0, -yaw, 0)));
 }
 
 glm::vec3 Player::getEyePos() { return position + worldUp; }
