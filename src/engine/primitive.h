@@ -14,8 +14,9 @@ public:
   void buffer();
   void draw(Shader &shader);
   Texture &getTexture();
-  glm::vec3 *findIntersection(glm::mat4 modelMat, glm::vec3 origin,
-                              glm::vec3 direction);
+  vector<Vertex> &getVertices();
+  float findIntersectionCoefficient(glm::mat4 modelMat, glm::vec3 origin,
+                                    glm::vec3 direction);
 
 private:
   unsigned int VAO, VBO, EBO;

@@ -13,7 +13,8 @@ public:
   void bufferMap();
   void draw(Shader &shader);
   glm::vec3 getSpawnPos();
-  glm::vec3 *findIntersection(glm::vec3 origin, glm::vec3 direction);
+  float findIntersectionCoefficient(glm::vec3 origin, glm::vec3 direction);
+  float findIntersectionCoefficient(Node &anotherNode, glm::vec3 direction);
 
 private:
   vector<Node> nodes;

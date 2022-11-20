@@ -54,28 +54,59 @@ bool Node::isSpawn() { return spawn; }
 
 glm::vec3 &Node::getTranslation() { return translation; }
 
-glm::vec3 *Node::findIntersection(glm::vec3 origin, glm::vec3 direction) {
-  vector<glm::vec3 *> intersections;
+float Node::findIntersectionCoefficient(glm::vec3 origin, glm::vec3 direction) {
+  vector<float> coefficients;
   float minDistance = MAXFLOAT;
   glm::mat4 modelMat = getModelMat();
   for (Primitive &primitive : mesh->getPrimitives()) {
-    glm::vec3 *intersection =
-        primitive.findIntersection(modelMat, origin, direction);
-    if (intersection == NULL) {
+    float coefficient =
+        primitive.findIntersectionCoefficient(modelMat, origin, direction);
+    if (coefficient == MAXFLOAT) {
       continue;
     }
-    intersections.push_back(intersection);
+    coefficients.push_back(coefficient);
   }
 
   for (Node &childNode : children) {
-    glm::vec3 *intersection = childNode.findIntersection(origin, direction);
-    if (intersection == NULL) {
+    float coefficient =
+        childNode.findIntersectionCoefficient(origin, direction);
+    if (coefficient == MAXFLOAT) {
       continue;
     }
-    intersections.push_back(intersection);
+    coefficients.push_back(coefficient);
   }
 
-  return Utils::getMinDistanceToOriginVector(intersections, origin);
+  return Utils::getMinFloat(coefficients);
+}
+
+float Node::findIntersectionCoefficient(Node &node, glm::vec3 direction) {
+  vector<float> coefficients;
+  float minDistance = MAXFLOAT;
+  glm::mat4 modelMat = getModelMat();
+  for (Primitive &primitive : mesh->getPrimitives()) {
+    for (Primitive &anotherPrimitive : node.mesh->getPrimitives()) {
+      for (Vertex &vertex : anotherPrimitive.getVertices()) {
+        glm::vec3 origin =
+            node.getModelMat() * glm::vec4(vertex.position, 1.0f);
+        float coefficient =
+            primitive.findIntersectionCoefficient(modelMat, origin, direction);
+        if (coefficient == MAXFLOAT) {
+          continue;
+        }
+        coefficients.push_back(coefficient);
+      }
+    }
+  }
+
+  for (Node &childNode : children) {
+    float coefficient = childNode.findIntersectionCoefficient(node, direction);
+    if (coefficient == MAXFLOAT) {
+      continue;
+    }
+    coefficients.push_back(coefficient);
+  }
+
+  return Utils::getMinFloat(coefficients);
 }
 
 glm::mat4 Node::getModelMat() {
@@ -93,3 +124,5 @@ void Node::setTranslation(glm::vec3 translation) {
 void Node::setScale(glm::vec3 scale) { this->scale = scale; }
 
 void Node::setRotation(glm::quat rotation) { this->rotation = rotation; }
+
+Mesh *Node::getMesh() { return mesh; }

@@ -46,17 +46,30 @@ void Map::draw(Shader &shader) {
   }
 }
 
-glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
-  vector<glm::vec3 *> intersections;
+float Map::findIntersectionCoefficient(glm::vec3 origin, glm::vec3 direction) {
+  vector<float> coefficients;
   for (Node &node : nodes) {
-    glm::vec3 *intersection = node.findIntersection(origin, direction);
-    if (intersection == NULL) {
+    float coefficient = node.findIntersectionCoefficient(origin, direction);
+    if (coefficient == MAXFLOAT) {
       continue;
     }
-    intersections.push_back(intersection);
+    coefficients.push_back(coefficient);
   }
-  glm::vec3 *result =
-      Utils::getMinDistanceToOriginVector(intersections, origin);
+  float result = Utils::getMinFloat(coefficients);
+  return result;
+}
+
+float Map::findIntersectionCoefficient(Node &anotherNode, glm::vec3 direction) {
+  vector<float> coefficients;
+  for (Node &node : nodes) {
+    float coefficient =
+        node.findIntersectionCoefficient(anotherNode, direction);
+    if (coefficient == MAXFLOAT) {
+      continue;
+    }
+    coefficients.push_back(coefficient);
+  }
+  float result = Utils::getMinFloat(coefficients);
   return result;
 }
 

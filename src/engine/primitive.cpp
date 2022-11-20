@@ -53,9 +53,10 @@ void Primitive::draw(Shader &shader) {
 
 Texture &Primitive::getTexture() { return texture; }
 
-glm::vec3 *Primitive::findIntersection(glm::mat4 modelMat, glm::vec3 origin,
-                                       glm::vec3 direction) {
-  vector<glm::vec3 *> intersections;
+float Primitive::findIntersectionCoefficient(glm::mat4 modelMat,
+                                             glm::vec3 origin,
+                                             glm::vec3 direction) {
+  vector<float> coefficients;
   glm::mat3 normalMat = glm::inverseTranspose(modelMat);
   for (int i = 0; i < indices.size(); i += 3) {
     glm::vec3 normal = normalMat * vertices[indices[i]].normal;
@@ -80,7 +81,9 @@ glm::vec3 *Primitive::findIntersection(glm::mat4 modelMat, glm::vec3 origin,
     if (!Utils::isPointInsideTriangle(a, b, c, normal, *intersection)) {
       continue;
     }
-    intersections.push_back(intersection);
+    coefficients.push_back(vectorCoefficient);
   }
-  return Utils::getMinDistanceToOriginVector(intersections, origin);
+  return Utils::getMinFloat(coefficients);
 }
+
+vector<Vertex> &Primitive::getVertices() { return vertices; }

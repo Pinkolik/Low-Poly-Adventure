@@ -35,21 +35,29 @@ glm::vec3 Player::getFront() { return front; }
 
 float Player::getZoom() { return zoom; }
 
-void Player::processKeyboard(GLFWwindow *window, float deltaTime) {
+void Player::processKeyboard(GLFWwindow *window, Map &map, float deltaTime) {
   float pressTime = glfwGetTime();
   float velocity = movementSpeed * deltaTime;
+  glm::vec3 direction = glm::vec3(0);
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    position += glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
+    direction += glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    position -= glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
+    direction -= glm::normalize(front * glm::vec3(1.0f, 0, 1.0f)) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    position -= right * glm::vec3(1.0f, 0, 1.0f) * velocity;
+    direction -= right * glm::vec3(1.0f, 0, 1.0f) * velocity;
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    position += right * glm::vec3(1.0f, 0, 1.0f) * velocity;
+    direction += right * glm::vec3(1.0f, 0, 1.0f) * velocity;
   }
+  float intersectionCoefficient =
+      map.findIntersectionCoefficient(*getPlayerBox(), direction) - 0.001f;
+  Node projection = *getPlayerBox();
+  projection.setTranslation(projection.getTranslation() +
+                            direction * intersectionCoefficient);
+  Utils::debugNodes.push_back(projection);
+  position += direction * min(1.0f, intersectionCoefficient);
   if (pressTime - lastPressTime > 0.3 &&
       glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
     thirdPerson = !thirdPerson;
@@ -94,26 +102,22 @@ void Player::updatePlayerVectors() {
 
 void Player::tick(Map &map, float deltaTime) {
   glm::vec3 down = -worldUp;
+  float fallCoefficient = fallTime * GRAVITY;
 
-  glm::vec3 afterFallPos = position + down * fallTime * GRAVITY;
+  float intersectionCoefficient =
+      map.findIntersectionCoefficient(*getPlayerBox(), down) - 0.001f;
+  Node fallProjection = *getPlayerBox();
+  fallProjection.setTranslation(fallProjection.getTranslation() +
+                                down * intersectionCoefficient);
+  Utils::debugNodes.push_back(fallProjection);
 
-  glm::vec3 *intersection = map.findIntersection(position, down);
-  if (intersection == NULL) {
-    position = afterFallPos;
-    fallTime += deltaTime;
-    return;
-  }
-  DebugCube::cubes.push_back(DebugCube(*intersection, glm::vec3(0.1)));
-  float fallDistance = glm::distance(position, afterFallPos);
-  float intersectionDistance = glm::distance(position, *intersection);
-  if (intersectionDistance < fallDistance) {
-    position = *intersection;
+  if (fallCoefficient > intersectionCoefficient) {
+    position += down * intersectionCoefficient;
     fallTime = 0;
   } else {
-    position = afterFallPos;
+    position += down * fallCoefficient;
     fallTime += deltaTime;
   }
-  delete intersection;
 }
 
 glm::vec3 Player::getEyePos() { return position + worldUp; }

@@ -7,6 +7,7 @@
 #include "engine/map.h"
 #include "engine/player.h"
 #include "engine/shader.h"
+#include "engine/utils.h"
 // GLM
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -72,12 +73,13 @@ void initGlad() {
   }
 }
 
-void processInput(GLFWwindow *window, float deltaTime, Player *player) {
+void processInput(GLFWwindow *window, Map &map, float deltaTime,
+                  Player *player) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
-  player->processKeyboard(window, deltaTime);
+  player->processKeyboard(window, map, deltaTime);
 }
 
 void mainLoop(GLFWwindow *window) {
@@ -94,11 +96,12 @@ void mainLoop(GLFWwindow *window) {
   float lastFrame = 0.0f;
   while (!glfwWindowShouldClose(window)) {
     DebugCube::cubes.clear();
+    Utils::debugNodes.clear();
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    processInput(window, deltaTime, player);
+    processInput(window, map, deltaTime, player);
     player->tick(map, deltaTime);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -119,6 +122,9 @@ void mainLoop(GLFWwindow *window) {
     shader.setBool("debug", true);
     for (DebugCube &cube : DebugCube::cubes) {
       cube.draw(shader);
+    }
+    for (Node &node : Utils::debugNodes) {
+      node.draw(shader);
     }
     player->getPlayerBox()->draw(shader);
 

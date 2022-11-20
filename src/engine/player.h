@@ -26,7 +26,7 @@ public:
 
   float getZoom();
 
-  void processKeyboard(GLFWwindow *window, float deltaTime);
+  void processKeyboard(GLFWwindow *window, Map &map, float deltaTime);
 
   void processMouseMovement(float xOffset, float yOffset);
 

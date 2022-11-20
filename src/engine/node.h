@@ -17,13 +17,15 @@ public:
   void addChild(Node &child);
   bool isSpawn();
   glm::vec3 &getTranslation();
-  glm::vec3 *findIntersection(glm::vec3 origin, glm::vec3 direction);
+  Mesh *getMesh();
+  float findIntersectionCoefficient(glm::vec3 origin, glm::vec3 direction);
+  float findIntersectionCoefficient(Node &node, glm::vec3 direction);
   void setTranslation(glm::vec3 translation);
   void setScale(glm::vec3 scale);
   void setRotation(glm::quat rotation);
+  glm::mat4 getModelMat();
 
 private:
-  glm::mat4 getModelMat();
 
   Mesh *mesh;
   glm::quat rotation = glm::quat(1, 0, 0, 0);

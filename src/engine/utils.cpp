@@ -3,24 +3,19 @@
 #include "primitive.h"
 #include "texture.h"
 
-glm::vec3 *Utils::getMinDistanceToOriginVector(vector<glm::vec3 *> &points,
-                                               glm::vec3 origin) {
-  glm::vec3 *result = NULL;
-  if (points.empty()) {
-    return NULL;
+vector<Node> Utils::debugNodes;
+
+float Utils::getMinFloat(vector<float> floats) {
+  if (floats.empty()) {
+    return MAXFLOAT;
   }
-  float minDistance = MAXFLOAT;
-  for (auto point : points) {
-    float distance = glm::distance(*point, origin);
-    if (distance < minDistance) {
-      minDistance = distance;
-      delete result;
-      result = point;
-    } else {
-      delete point;
+  float min = MAXFLOAT;
+  for (auto f : floats) {
+    if (f < min) {
+      min = f;
     }
   }
-  return result;
+  return min;
 }
 
 bool Utils::isPointInsideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
