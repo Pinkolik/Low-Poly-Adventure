@@ -21,13 +21,18 @@ add_executable(Game
                 src/engine/shader.h
                 src/engine/shader.cpp
                 src/engine/mesh.h
+                src/engine/mesh.cpp
                 src/engine/map.cpp
                 src/engine/map.h
                 src/engine/node.h
+                src/engine/node.cpp
                 src/engine/primitive.h
+                src/engine/primitive.cpp
                 src/engine/player.h
                 src/engine/player.cpp
                 src/engine/debug_cube.cpp
-                src/engine/debug_cube.h)
+                src/engine/debug_cube.h
+                src/engine/utils.h
+                src/engine/utils.cpp)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)

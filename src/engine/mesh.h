@@ -3,7 +3,12 @@
 #include "primitive.h"
 #include <vector>
 using namespace std;
-struct Mesh {
+class Mesh {
+public:
+  Mesh(vector<Primitive> &primitives);
+  vector<Primitive> &getPrimitives();
+
+private:
   vector<Primitive> primitives;
 };
 #endif

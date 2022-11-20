@@ -2,6 +2,7 @@
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "primitive.h"
+#include "utils.h"
 #include <cmath>
 #include <cstddef>
 #include <exception>
@@ -22,211 +23,46 @@ Map::Map(const char *path) { loadModel(path); }
 
 glm::vec3 Map::getSpawnPos() {
   for (Node &node : nodes) {
-    if (!node.isSpawn) {
+    if (!node.isSpawn()) {
       continue;
     }
-    return node.translation;
+    return node.getTranslation();
   }
   return glm::vec3(0);
 }
 
 void Map::bufferMap() {
   for (Node &node : nodes) {
-    bufferNode(node);
+    node.buffer();
   }
 }
 
 void Map::draw(Shader &shader) {
   for (Node &node : nodes) {
-    if (node.isSpawn) {
+    if (node.isSpawn()) {
       continue;
     }
-    drawNode(shader, node);
+    node.draw(shader);
   }
 }
 
 glm::vec3 *Map::findIntersection(glm::vec3 origin, glm::vec3 direction) {
   vector<glm::vec3 *> intersections;
   for (Node &node : nodes) {
-    glm::vec3 *intersection = findIntersection(node, origin, direction);
+    glm::vec3 *intersection = node.findIntersection(origin, direction);
     if (intersection == NULL) {
       continue;
     }
     intersections.push_back(intersection);
   }
-  glm::vec3 *result = getMinDistanceToOriginVector(intersections, origin);
+  glm::vec3 *result =
+      Utils::getMinDistanceToOriginVector(intersections, origin);
   return result;
-}
-
-glm::vec3 *Map::findIntersection(Node &node, glm::vec3 origin,
-                                 glm::vec3 direction) {
-  vector<glm::vec3 *> intersections;
-  glm::mat4 modelMat = getModelMatForNode(node);
-  for (Primitive &primitive : node.mesh.primitives) {
-    glm::vec3 *intersection =
-        findIntersection(primitive, modelMat, origin, direction);
-    if (intersection == NULL) {
-      continue;
-    }
-    intersections.push_back(intersection);
-  }
-
-  for (Node &childNode : node.children) {
-    glm::vec3 *intersection = findIntersection(childNode, origin, direction);
-    if (intersection == NULL) {
-      continue;
-    }
-    intersections.push_back(intersection);
-  }
-
-  return getMinDistanceToOriginVector(intersections, origin);
-}
-
-glm::vec3 *Map::findIntersection(Primitive &primitive, glm::mat4 modelMat,
-                                 glm::vec3 origin, glm::vec3 direction) {
-  vector<glm::vec3 *> intersections;
-  glm::mat3 normalMat = glm::inverseTranspose(modelMat);
-  for (int i = 0; i < primitive.indices.size(); i += 3) {
-    glm::vec3 normal =
-        normalMat * primitive.vertices[primitive.indices[i]].normal;
-    glm::vec3 a =
-        modelMat *
-        glm::vec4(primitive.vertices[primitive.indices[i]].position, 1);
-    glm::vec3 b =
-        modelMat *
-        glm::vec4(primitive.vertices[primitive.indices[i + 1]].position, 1);
-    glm::vec3 c =
-        modelMat *
-        glm::vec4(primitive.vertices[primitive.indices[i + 2]].position, 1);
-
-    float surfaceDistanceFromOrigin = -glm::dot(normal, a);
-    float dotNormalDirection = glm::dot(normal, direction);
-    if (dotNormalDirection == 0.f) {
-      continue; // vector is parallel to surface
-    }
-    float vectorCoefficient =
-        -(glm::dot(normal, origin) + surfaceDistanceFromOrigin) /
-        dotNormalDirection;
-    if (vectorCoefficient < 0.f) {
-      continue; // vector is behind surface
-    }
-    glm::vec3 *intersection =
-        new glm::vec3(origin + vectorCoefficient * direction);
-
-    if (!isPointInsideTriangle(a, b, c, normal, *intersection)) {
-      continue;
-    }
-    intersections.push_back(intersection);
-  }
-  return getMinDistanceToOriginVector(intersections, origin);
-}
-
-glm::vec3 *Map::getMinDistanceToOriginVector(vector<glm::vec3 *> &points,
-                                             glm::vec3 origin) {
-  glm::vec3 *result = NULL;
-  if (points.empty()) {
-    return NULL;
-  }
-  float minDistance = MAXFLOAT;
-  for (auto point : points) {
-    float distance = glm::distance(*point, origin);
-    if (distance < minDistance) {
-      minDistance = distance;
-      delete result;
-      result = point;
-    }
-  }
-  return result;
-}
-
-bool Map::isPointInsideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
-                                glm::vec3 normal, glm::vec3 point) {
-  glm::vec3 edge0 = b - a;
-  glm::vec3 edge1 = c - b;
-  glm::vec3 edge2 = a - c;
-  glm::vec3 c0 = point - a;
-  glm::vec3 c1 = point - b;
-  glm::vec3 c2 = point - c;
-
-  return glm::dot(normal, glm::cross(edge0, c0)) > 0 &&
-         glm::dot(normal, glm::cross(edge1, c1)) > 0 &&
-         glm::dot(normal, glm::cross(edge2, c2)) > 0;
 }
 
 void Map::logVector(const char *prefix, glm::vec3 vec) {
   std::cout << prefix << " " << vec.x << "," << vec.y << "," << vec.z
             << std::endl;
-}
-
-void Map::drawNode(Shader &shader, Node &node) {
-  glm::mat4 modelMat = getModelMatForNode(node);
-  shader.setMatrix4f("model", modelMat);
-  for (Primitive &primitive : node.mesh.primitives) {
-    drawPrimitive(shader, primitive);
-  }
-
-  for (Node &childNode : node.children) {
-    drawNode(shader, childNode);
-  }
-}
-
-glm::mat4 Map::getModelMatForNode(Node &node) {
-  glm::mat4 translation = glm::translate(glm::mat4(1), node.translation);
-  glm::mat4 rotation = glm::toMat4(node.rotation);
-  glm::mat4 scale = glm::scale(glm::mat4(1), node.scale);
-  glm::mat4 modelMat = translation * rotation * scale;
-  return modelMat;
-}
-
-void Map::drawPrimitive(Shader &shader, Primitive &primitive) {
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, primitive.texture.id);
-  glBindVertexArray(primitive.VAO);
-  glDrawElements(GL_TRIANGLES, primitive.indices.size(), GL_UNSIGNED_SHORT, 0);
-}
-
-void Map::bufferNode(Node &node) {
-  for (Primitive &primitive : node.mesh.primitives) {
-    bufferPrimitive(primitive);
-  }
-
-  for (Node &childNode : node.children) {
-    bufferNode(childNode);
-  }
-}
-
-void Map::bufferPrimitive(Primitive &primitive) {
-  unsigned int VAO, VBO, EBO;
-
-  glGenVertexArrays(1, &VAO);
-
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  primitive.VAO = VAO;
-  primitive.VBO = VBO;
-  primitive.EBO = EBO;
-
-  glBindVertexArray(VAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-  glBufferData(GL_ARRAY_BUFFER, primitive.vertices.size() * sizeof(Vertex),
-               primitive.vertices.data(), GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               primitive.indices.size() * sizeof(unsigned short),
-               primitive.indices.data(), GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, normal));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, texcoord));
-
-  glBindVertexArray(0);
 }
 
 void Map::loadModel(const char *path) {
@@ -259,44 +95,26 @@ void Map::loadModel(const char *path) {
 }
 
 Node Map::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
-  Node node;
   vector<double> rotation = gltfNode.rotation;
   vector<double> scale = gltfNode.scale;
   vector<double> translation = gltfNode.translation;
-  if (!rotation.empty()) {
-    node.rotation =
-        glm::quat(rotation[3], rotation[0], rotation[1], rotation[2]);
-  }
-  if (!scale.empty()) {
-    node.scale = glm::vec3(scale[0], scale[1], scale[2]);
-  }
-  if (!translation.empty()) {
-    node.translation =
-        glm::vec3(translation[0], translation[1], translation[2]);
-  }
 
   tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
-  node.mesh = prcoessMesh(gltfModel, gltfMesh);
-  for (auto &primitive : node.mesh.primitives) {
-    if (primitive.texture.name.compare("spawn") == 0) {
-      node.isSpawn = true;
-    }
-  }
+  Mesh mesh = prcoessMesh(gltfModel, gltfMesh);
 
+  Node node = Node(rotation, scale, translation, mesh);
   for (size_t i = 0; i < gltfNode.children.size(); i++) {
     tinygltf::Node &gltfChildNode = gltfModel.nodes[gltfNode.children[i]];
     Node childNode = processNode(gltfModel, gltfChildNode);
-    node.children.push_back(childNode);
+    node.addChild(childNode);
   }
   return node;
 }
 
 Mesh Map::prcoessMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
-  Mesh mesh;
-
+  vector<Primitive> primitives;
   for (size_t i = 0; i < gltfMesh.primitives.size(); i++) {
     tinygltf::Primitive &gltfPrimitive = gltfMesh.primitives[i];
-    Primitive primitive;
 
     vector<vector<float>> normals;
     vector<vector<float>> positions;
@@ -315,19 +133,22 @@ Mesh Map::prcoessMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
     assert(normals.size() == positions.size() &&
            positions.size() == texcoord.size());
 
+    vector<Vertex> vertices;
     for (size_t j = 0; j < normals.size(); j++) {
       Vertex vertex;
       vertex.position =
           glm::vec3(positions[j][0], positions[j][1], positions[j][2]);
       vertex.normal = glm::vec3(normals[j][0], normals[j][1], normals[j][2]);
       vertex.texcoord = glm::vec2(texcoord[j][0], texcoord[j][1]);
-      primitive.vertices.push_back(vertex);
+      vertices.push_back(vertex);
     }
-    primitive.indices =
+    vector<unsigned short> indices =
         getUnsignedShortVector(gltfModel, gltfPrimitive.indices);
-    primitive.texture = getTexture(gltfModel, gltfPrimitive.material);
-    mesh.primitives.push_back(primitive);
+    Texture texture = getTexture(gltfModel, gltfPrimitive.material);
+    Primitive primitive = Primitive(vertices, indices, texture);
+    primitives.push_back(primitive);
   }
+  Mesh mesh = Mesh(primitives);
   return mesh;
 }
 
