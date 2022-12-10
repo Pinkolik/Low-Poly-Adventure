@@ -5,23 +5,19 @@
 #include "vertex.h"
 #include <vector>
 
-using namespace std;
-
 class Primitive {
 public:
-	Primitive(vector<Vertex> &vertices, vector<unsigned short> &indices,
-			Texture &texture);
-	void buffer();
-	void draw(Shader &shader);
-	Texture& getTexture();
-	vector<Vertex>& getVertices();
-	float findIntersectionCoefficient(glm::mat4 modelMat, glm::vec3 origin,
-			glm::vec3 direction);
+  Primitive(std::vector<Vertex> &vertices, std::vector<unsigned short> &indices,
+            Texture &texture);
+  void buffer();
+  void draw(Shader &shader);
+  Texture &getTexture();
+  std::vector<Vertex> &getVertices();
 
 private:
-	unsigned int VAO, VBO, EBO;
-	vector<Vertex> vertices;
-	vector<unsigned short> indices;
-	Texture texture;
+  unsigned int VAO, VBO, EBO;
+  std::vector<Vertex> vertices;
+  std::vector<unsigned short> indices;
+  Texture texture;
 };
 #endif

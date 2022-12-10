@@ -2,13 +2,13 @@
 #define MESH_H
 #include "primitive.h"
 #include <vector>
-using namespace std;
+
 class Mesh {
 public:
-	Mesh(vector<Primitive> &primitives);
-	vector<Primitive>& getPrimitives();
+  Mesh(std::vector<Primitive> &primitives);
+  std::vector<Primitive> &getPrimitives();
 
 private:
-	vector<Primitive> primitives;
+  std::vector<Primitive> primitives;
 };
 #endif

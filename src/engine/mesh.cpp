@@ -1,8 +1,5 @@
 #include "mesh.h"
 
-Mesh::Mesh(vector<Primitive> &primitives) {
-	this->primitives = primitives;
-}
-vector<Primitive>& Mesh::getPrimitives() {
-	return primitives;
-}
+Mesh::Mesh(std::vector<Primitive> &primitives) : primitives(primitives) {}
+
+std::vector<Primitive> &Mesh::getPrimitives() { return primitives; }
