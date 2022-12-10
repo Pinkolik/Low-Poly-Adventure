@@ -1,5 +1,5 @@
-/build
+**/build
 /.cache
 /compile_commands.json
-/.cproject
-/.project
+**/.cproject
+**/.project

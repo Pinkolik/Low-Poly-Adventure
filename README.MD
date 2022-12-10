@@ -19,14 +19,16 @@ To build and run the game:
 3. Navigate to the root directory of the project
 4. Run the following command to build the game:
 	```bash
-	    $ mkdir build
-	    $ cd build
-	    $ cmake ..
-	    $ cmake --build .
+	git submodule init
+	git submodule update
+	mkdir build
+	cd build
+	cmake ..
+	cmake --build .
 	```
 5. Once the build is complete, run the following command to start the game:
 	```bash
-	    $ ./Game
+	./Game
 	```
 
 Features:
