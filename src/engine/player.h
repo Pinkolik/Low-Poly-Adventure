@@ -14,47 +14,46 @@ const float GRAVITY = 0.1;
 
 class Player {
 public:
-  Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
-         float pitch = PITCH);
+	Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up =
+			glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 
-  glm::mat4 getViewMatrix();
+	glm::mat4 getViewMatrix();
 
-  glm::vec3 getPosition();
+	glm::vec3 getPosition();
 
-  glm::vec3 getFront();
+	glm::vec3 getFront();
 
-  float getZoom();
+	float getZoom();
 
-  void processKeyboard(GLFWwindow *window, Map &map, float deltaTime);
+	void processKeyboard(GLFWwindow *window, Map &map, float deltaTime);
 
-  void processMouseMovement(float xOffset, float yOffset);
+	void processMouseMovement(float xOffset, float yOffset);
 
-  void processMouseScroll(float yOffset);
+	void processMouseScroll(float yOffset);
 
-  void tick(Map &map, float deltaTime);
+	void tick(Map &map, float deltaTime);
 
-  Node *getPlayerBox();
+	Node* getPlayerBox();
 
 private:
-  glm::vec3 position;
-  glm::vec3 front;
-  glm::vec3 right;
-  glm::vec3 worldUp;
+	glm::vec3 position;
+	glm::vec3 front;
+	glm::vec3 right;
+	glm::vec3 worldUp;
 
-  float yaw;
-  float pitch;
+	float yaw;
+	float pitch;
 
-  float movementSpeed;
-  float mouseSensitivity;
-  float zoom;
-  float fallTime;
-  float lastPressTime = 0;
+	float movementSpeed;
+	float mouseSensitivity;
+	float zoom;
+	float fallTime;
+	float lastPressTime = 0;
 
-  bool thirdPerson = false;
-  Node *playerBox = NULL;
+	bool thirdPerson = false;
+	Node *playerBox = NULL;
 
-  glm::vec3 getEyePos();
-  void updatePlayerVectors();
+	glm::vec3 getEyePos();
+	void updatePlayerVectors();
 };
 #endif

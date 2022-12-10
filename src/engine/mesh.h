@@ -5,10 +5,10 @@
 using namespace std;
 class Mesh {
 public:
-  Mesh(vector<Primitive> &primitives);
-  vector<Primitive> &getPrimitives();
+	Mesh(vector<Primitive> &primitives);
+	vector<Primitive>& getPrimitives();
 
 private:
-  vector<Primitive> primitives;
+	vector<Primitive> primitives;
 };
 #endif
