@@ -1,4 +1,4 @@
-Low Poly Adventure
+# Low Poly Adventure
 
 The game is set in a low polygon world with low resolution textures. The graphics are blocky and pixelated, evoking a sense of nostalgia for the late 90s era of gaming. The player controls a character who can explore the various environments of the game, each with their own unique low polygon design and blocky textures.
 
@@ -8,12 +8,12 @@ One of the main features of the game is its retro, late 90s aesthetic. The low p
 
 Overall, the game is designed to be a nostalgic and fun experience for players who remember the days of low polygon graphics and blocky textures, and for those who are interested in exploring the world of low polygon games without the presence of enemies.
 
-Requirements:
+## Requirements:
 - OpenGL 3.3 or higher
 - C++11 or higher
 - CMake 3.24 or higher
 
-To build and run the game:
+## To build and run the game:
 1. Install the required dependencies (OpenGL, C++11, CMake)
 2. Clone or download the source code from the repository
 3. Navigate to the root directory of the project
@@ -31,14 +31,14 @@ To build and run the game:
 	./Game
 	```
 
-Features:
+## Features:
 - A low polygon, blocky world with low resolution textures, designed to look like a late 90s game
 - Simple, intuitive controls allowing the player to move their character, jump, and interact with the world
 - Various environments to explore, each with their own unique design and challenges
 - Puzzles and obstacles to overcome as the player progresses through the game
 - A retro, nostalgic aesthetic inspired by the late 90s era of gaming
 
-Credits:
+## Credits:
 - OpenGL library
 - GLAD library
 - GLFW library
@@ -47,5 +47,8 @@ Credits:
 - stb_image library
 - Blender (for making models for this game)
 
-Contact:
+## Screenshots:
+[![https://imgur.com/6NwDq6j.png](https://imgur.com/6NwDq6j.png)](https://imgur.com/6NwDq6j.png)
+
+## Contact:
 For help or support with the game, please contact me at mrpinkolik@gmail.com
