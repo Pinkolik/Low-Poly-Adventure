@@ -30,6 +30,7 @@ add_executable(Game
                 src/engine/node.cpp
                 src/engine/primitive.h
                 src/engine/primitive.cpp
+                src/engine/position_struct.h
                 src/engine/player.h
                 src/engine/player.cpp
                 src/engine/intersection/intersection_util.h

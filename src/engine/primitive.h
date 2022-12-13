@@ -1,5 +1,6 @@
 #ifndef PRIMITIVE_H
 #define PRIMITIVE_H
+#include "glm/fwd.hpp"
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
@@ -11,6 +12,9 @@ public:
             Texture &texture);
   void buffer();
   void draw(Shader &shader);
+
+  bool isIntersecting(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
+
   Texture &getTexture();
   std::vector<Vertex> &getVertices();
 

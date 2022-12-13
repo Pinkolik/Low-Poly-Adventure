@@ -1,8 +1,7 @@
 #include "primitive.h"
+#include "intersection/intersection_util.h"
 #include "texture.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/vec3.hpp>
 
 Primitive::Primitive(std::vector<Vertex> &vertices,
                      std::vector<unsigned short> &indices, Texture &texture)
@@ -51,3 +50,32 @@ void Primitive::draw(Shader &shader) {
 Texture &Primitive::getTexture() { return texture; }
 
 std::vector<Vertex> &Primitive::getVertices() { return vertices; }
+
+bool Primitive::isIntersecting(glm::mat4 modelMat, Primitive other,
+                               glm::mat4 otherModelMat) {
+  for (int i = 0; i < indices.size(); i += 2) {
+    std::vector<glm::vec3> firstTriangle;
+    firstTriangle.push_back(modelMat *
+                            glm::vec4(vertices[indices[i]].position, 1.0f));
+    firstTriangle.push_back(modelMat *
+                            glm::vec4(vertices[indices[i + 1]].position, 1.0f));
+    firstTriangle.push_back(modelMat *
+                            glm::vec4(vertices[indices[i + 2]].position, 1.0f));
+    for (int j = 0; j < other.indices.size(); j += 2) {
+      std::vector<glm::vec3> secondTriangle;
+      secondTriangle.push_back(
+          otherModelMat *
+          glm::vec4(other.vertices[other.indices[j]].position, 1.0f));
+      secondTriangle.push_back(
+          otherModelMat *
+          glm::vec4(other.vertices[other.indices[j + 1]].position, 1.0f));
+      secondTriangle.push_back(
+          otherModelMat *
+          glm::vec4(other.vertices[other.indices[j + 2]].position, 1.0f));
+      if (IntersectionUtil::isIntersecting(firstTriangle, secondTriangle)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

@@ -1,9 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 #include "mesh.h"
+#include "position_struct.h"
 #include "shader.h"
-#include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/vec3.hpp>
 #include <vector>
 
 class Node {
@@ -13,8 +13,7 @@ public:
 
   void buffer();
   void draw(Shader &shader);
-  void draw(Shader &shader, glm::quat addRot, glm::vec3 addScale,
-            glm::vec3 addTrans);
+  void draw(Shader &shader, PositionStruct modelPos);
   void addChild(Node &child);
   bool isSpawn();
 
@@ -25,19 +24,20 @@ public:
   glm::vec3 getTranslation();
   Mesh &getMesh();
 
+  bool isIntersecting(PositionStruct modelPos, Node &other,
+                      PositionStruct otherModelPos);
+
 private:
   Mesh mesh;
 
-  glm::quat rotation = glm::quat(1, 0, 0, 0);
-  glm::vec3 scale = glm::vec3(1);
-  glm::vec3 translation = glm::vec3(0);
+  PositionStruct position;
 
   std::vector<Node> children;
   bool spawn = false;
+  bool intersectionDetected = false;
 
   glm::mat4 getModelMat();
-  glm::mat4 getModelMat(glm::quat addRot, glm::vec3 addScale,
-                        glm::vec3 addTrans);
+  glm::mat4 getModelMat(PositionStruct modelPos);
 };
 
 #endif

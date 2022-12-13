@@ -18,5 +18,9 @@ float Projection::getMin() { return min; }
 float Projection::getMax() { return max; }
 
 bool Projection::isIntersecting(Projection &other) {
-  return this->max >= other.min || other.max >= this->min;
+  if (min > other.min) {
+    return min <= other.max;
+  } else {
+    return other.min <= other.max;
+  }
 }

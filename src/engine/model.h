@@ -5,6 +5,7 @@
 #include "node.h"
 #include "primitive.h"
 #include "shader.h"
+#include "position_struct.h"
 #include <vector>
 
 class Model {
@@ -20,12 +21,12 @@ public:
 
   glm::vec3 getSpawnPos();
 
+  bool isIntersecting(Model &other);
+
 private:
   std::vector<Node> nodes;
 
-  glm::quat rotation = glm::quat(1, 0, 0, 0);
-  glm::vec3 scale = glm::vec3(1);
-  glm::vec3 translation = glm::vec3(0);
+  PositionStruct position;
 
   void load(const char *path);
 

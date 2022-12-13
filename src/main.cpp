@@ -111,7 +111,13 @@ void mainLoop(GLFWwindow *window) {
 
     map.draw(shader);
 
+    shader.setBool("debug", true);
     player->getModel().draw(shader);
+    bool isIntersecting = map.isIntersecting(player->getModel());
+    if (isIntersecting) {
+      std::cout << "Intersecting " << glfwGetTime() << std::endl;
+    }
+    shader.setBool("debug", false);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

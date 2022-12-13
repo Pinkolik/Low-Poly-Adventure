@@ -22,6 +22,17 @@ glm::vec3 Model::getSpawnPos() {
   return glm::vec3(0);
 }
 
+bool Model::isIntersecting(Model &other) {
+  for (auto &node : nodes) {
+    for (auto &otherNode : other.nodes) {
+      if (node.isIntersecting(position, otherNode, other.position)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void Model::buffer() {
   for (Node &node : nodes) {
     node.buffer();
@@ -33,7 +44,7 @@ void Model::draw(Shader &shader) {
     // if (node.isSpawn()) {
     //   continue;
     // }
-    node.draw(shader, rotation, scale, translation);
+    node.draw(shader, position);
   }
 }
 
@@ -210,9 +221,11 @@ Texture Model::processTexture(tinygltf::Model &gltfModel,
 }
 
 void Model::setTranslation(glm::vec3 translation) {
-  this->translation = translation;
+  position.translation = translation;
 }
 
-void Model::setScale(glm::vec3 scale) { this->scale = scale; }
+void Model::setScale(glm::vec3 scale) { position.scale = scale; }
 
-void Model::setRotation(glm::quat rotation) { this->rotation = rotation; }
+void Model::setRotation(glm::quat rotation) {
+  position.rotation = rotation;
+}
