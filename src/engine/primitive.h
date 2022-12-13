@@ -13,7 +13,7 @@ public:
   void buffer();
   void draw(Shader &shader);
 
-  bool isIntersecting(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
+  glm::vec3 *getMinimumTranslationVec(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
 
   Texture &getTexture();
   std::vector<Vertex> &getVertices();
@@ -23,5 +23,8 @@ private:
   std::vector<Vertex> vertices;
   std::vector<unsigned short> indices;
   Texture texture;
+
+  std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 modelMat);
+  std::vector<glm::vec3> getTriangleNormals(int idx, glm::mat4 modelMat);
 };
 #endif

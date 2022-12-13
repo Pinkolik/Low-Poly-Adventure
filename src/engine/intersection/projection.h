@@ -10,6 +10,7 @@ public:
   float getMin();
   float getMax();
   bool isIntersecting(Projection &other);
+  float findIntersectionLength(Projection &other);
 
 private:
   float min = INFINITY;

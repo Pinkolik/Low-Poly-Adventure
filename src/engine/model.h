@@ -3,9 +3,9 @@
 #include "../helpers/tiny_gltf.h"
 #include "mesh.h"
 #include "node.h"
+#include "position_struct.h"
 #include "primitive.h"
 #include "shader.h"
-#include "position_struct.h"
 #include <vector>
 
 class Model {
@@ -21,7 +21,7 @@ public:
 
   glm::vec3 getSpawnPos();
 
-  bool isIntersecting(Model &other);
+  glm::vec3 *getMinimumTranslationVec(Model &other);
 
 private:
   std::vector<Node> nodes;

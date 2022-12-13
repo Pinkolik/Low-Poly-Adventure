@@ -22,15 +22,17 @@ glm::vec3 Model::getSpawnPos() {
   return glm::vec3(0);
 }
 
-bool Model::isIntersecting(Model &other) {
+glm::vec3 *Model::getMinimumTranslationVec(Model &other) {
   for (auto &node : nodes) {
     for (auto &otherNode : other.nodes) {
-      if (node.isIntersecting(position, otherNode, other.position)) {
-        return true;
+      glm::vec3 *mtv =
+          node.getMinimumTranslationVec(position, otherNode, other.position);
+      if (mtv != NULL) {
+        return mtv;
       }
     }
   }
-  return false;
+  return NULL;
 }
 
 void Model::buffer() {
@@ -226,6 +228,4 @@ void Model::setTranslation(glm::vec3 translation) {
 
 void Model::setScale(glm::vec3 scale) { position.scale = scale; }
 
-void Model::setRotation(glm::quat rotation) {
-  position.rotation = rotation;
-}
+void Model::setRotation(glm::quat rotation) { position.rotation = rotation; }

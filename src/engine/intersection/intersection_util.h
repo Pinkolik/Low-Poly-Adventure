@@ -5,8 +5,11 @@
 
 class IntersectionUtil {
 public:
-  static bool isIntersecting(std::vector<glm::vec3> &firstTriangle,
-                             std::vector<glm::vec3> &secondTriangle);
+  static glm::vec3 *
+  getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle,
+                           std::vector<glm::vec3> &firstTriangleNormals,
+                           std::vector<glm::vec3> &secondTriangle,
+                           std::vector<glm::vec3> &secondTriangleNormals);
 
 private:
   static std::vector<glm::vec3>

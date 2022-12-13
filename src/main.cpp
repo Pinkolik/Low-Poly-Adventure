@@ -112,12 +112,14 @@ void mainLoop(GLFWwindow *window) {
     map.draw(shader);
 
     shader.setBool("debug", true);
-    player->getModel().draw(shader);
-    bool isIntersecting = map.isIntersecting(player->getModel());
-    if (isIntersecting) {
-      std::cout << "Intersecting " << glfwGetTime() << std::endl;
+    glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel());
+    if (mtv != NULL) {
+      player->applyForce(*mtv);
+      delete mtv;
     }
+    player->getModel().draw(shader);
     shader.setBool("debug", false);
+    
 
     glfwSwapBuffers(window);
     glfwPollEvents();

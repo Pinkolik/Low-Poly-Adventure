@@ -24,7 +24,7 @@ public:
   glm::vec3 getTranslation();
   Mesh &getMesh();
 
-  bool isIntersecting(PositionStruct modelPos, Node &other,
+  glm::vec3 *getMinimumTranslationVec(PositionStruct modelPos, Node &other,
                       PositionStruct otherModelPos);
 
 private:
