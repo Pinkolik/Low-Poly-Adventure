@@ -13,7 +13,8 @@ public:
   void buffer();
   void draw(Shader &shader);
 
-  glm::vec3 *getMinimumTranslationVec(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
+  glm::vec3 *getMinimumTranslationVec(glm::mat4 modelMat, Primitive other,
+                                      glm::mat4 otherModelMat);
 
   Texture &getTexture();
   std::vector<Vertex> &getVertices();

@@ -112,14 +112,20 @@ void mainLoop(GLFWwindow *window) {
     map.draw(shader);
 
     shader.setBool("debug", true);
-    glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel());
-    if (mtv != NULL) {
-      player->applyForce(*mtv);
-      delete mtv;
+    std::vector<glm::vec3 *> mtvs =
+        map.getMinimumTranslationVec(player->getModel());
+    if (!mtvs.empty()) {
+      
+      for (unsigned int i = 0; i < mtvs.size(); i++) {
+        glm::vec3 *mtv = mtvs[i];
+        // std::cout << "applying force " << i << ": " << mtv->x << "," << mtv->y
+        //           << "," << mtv->z << std::endl;
+        player->applyForce(*mtv);
+        delete mtv;
+      }
     }
     player->getModel().draw(shader);
     shader.setBool("debug", false);
-    
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -21,7 +21,7 @@ public:
 
   glm::vec3 getSpawnPos();
 
-  glm::vec3 *getMinimumTranslationVec(Model &other);
+  std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other);
 
 private:
   std::vector<Node> nodes;

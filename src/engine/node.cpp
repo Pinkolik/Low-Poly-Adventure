@@ -90,13 +90,14 @@ void Node::setRotation(glm::quat rotation) { position.rotation = rotation; }
 Mesh &Node::getMesh() { return mesh; }
 
 glm::vec3 *Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
-                          PositionStruct otherModelPos) {
+                                          PositionStruct otherModelPos) {
   glm::mat4 modelMat = getModelMat(modelPos);
   glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
   bool result = false;
   for (Primitive &primitive : mesh.getPrimitives()) {
     for (Primitive &otherPrimitive : other.mesh.getPrimitives()) {
-      glm::vec3 *mtv = primitive.getMinimumTranslationVec(modelMat, otherPrimitive, otherModelMat);
+      glm::vec3 *mtv = primitive.getMinimumTranslationVec(
+          modelMat, otherPrimitive, otherModelMat);
       if (mtv != NULL) {
         intersectionDetected = true;
         return mtv;
@@ -105,7 +106,8 @@ glm::vec3 *Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
   }
 
   for (Node &childNode : children) {
-    glm::vec3 *mtv = childNode.getMinimumTranslationVec(modelPos, other, otherModelPos);
+    glm::vec3 *mtv =
+        childNode.getMinimumTranslationVec(modelPos, other, otherModelPos);
     if (mtv != NULL) {
       return mtv;
     }

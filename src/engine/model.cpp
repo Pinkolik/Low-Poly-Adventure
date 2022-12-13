@@ -22,17 +22,18 @@ glm::vec3 Model::getSpawnPos() {
   return glm::vec3(0);
 }
 
-glm::vec3 *Model::getMinimumTranslationVec(Model &other) {
+std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) {
+  std::vector<glm::vec3 *> res;
   for (auto &node : nodes) {
     for (auto &otherNode : other.nodes) {
       glm::vec3 *mtv =
           node.getMinimumTranslationVec(position, otherNode, other.position);
       if (mtv != NULL) {
-        return mtv;
+        res.push_back(mtv);
       }
     }
   }
-  return NULL;
+  return res;
 }
 
 void Model::buffer() {
