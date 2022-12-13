@@ -3,6 +3,7 @@
 #include "../helpers/tiny_gltf.h"
 #include "mesh.h"
 #include "node.h"
+#include "position_struct.h"
 #include "primitive.h"
 #include "shader.h"
 #include <vector>
@@ -20,12 +21,12 @@ public:
 
   glm::vec3 getSpawnPos();
 
+  std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other);
+
 private:
   std::vector<Node> nodes;
 
-  glm::quat rotation = glm::quat(1, 0, 0, 0);
-  glm::vec3 scale = glm::vec3(1);
-  glm::vec3 translation = glm::vec3(0);
+  PositionStruct position;
 
   void load(const char *path);
 

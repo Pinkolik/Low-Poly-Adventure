@@ -30,7 +30,13 @@ add_executable(Game
                 src/engine/node.cpp
                 src/engine/primitive.h
                 src/engine/primitive.cpp
+                src/engine/position_struct.h
                 src/engine/player.h
-                src/engine/player.cpp)
+                src/engine/player.cpp
+                src/engine/intersection/intersection_util.h
+                src/engine/intersection/intersection_util.cpp
+                src/engine/intersection/projection.h
+                src/engine/intersection/projection.cpp
+                )
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)

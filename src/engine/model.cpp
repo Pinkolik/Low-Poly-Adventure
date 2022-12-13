@@ -22,6 +22,20 @@ glm::vec3 Model::getSpawnPos() {
   return glm::vec3(0);
 }
 
+std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) {
+  std::vector<glm::vec3 *> res;
+  for (auto &node : nodes) {
+    for (auto &otherNode : other.nodes) {
+      glm::vec3 *mtv =
+          node.getMinimumTranslationVec(position, otherNode, other.position);
+      if (mtv != NULL) {
+        res.push_back(mtv);
+      }
+    }
+  }
+  return res;
+}
+
 void Model::buffer() {
   for (Node &node : nodes) {
     node.buffer();
@@ -33,7 +47,7 @@ void Model::draw(Shader &shader) {
     // if (node.isSpawn()) {
     //   continue;
     // }
-    node.draw(shader, rotation, scale, translation);
+    node.draw(shader, position);
   }
 }
 
@@ -210,9 +224,9 @@ Texture Model::processTexture(tinygltf::Model &gltfModel,
 }
 
 void Model::setTranslation(glm::vec3 translation) {
-  this->translation = translation;
+  position.translation = translation;
 }
 
-void Model::setScale(glm::vec3 scale) { this->scale = scale; }
+void Model::setScale(glm::vec3 scale) { position.scale = scale; }
 
-void Model::setRotation(glm::quat rotation) { this->rotation = rotation; }
+void Model::setRotation(glm::quat rotation) { position.rotation = rotation; }

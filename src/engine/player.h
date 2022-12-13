@@ -7,7 +7,7 @@
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 10.0f;
+const float SPEED = 3.0f;
 const float SENSITIVITY = 0.1f;
 
 class Player {
@@ -18,6 +18,7 @@ public:
 
   void processKeyboard(GLFWwindow *window, Model &map, float deltaTime);
   void processMouseMovement(float xOffset, float yOffset);
+  void applyForce(glm::vec3 &force);
 
   glm::mat4 getViewMatrix();
   glm::vec3 getPosition();

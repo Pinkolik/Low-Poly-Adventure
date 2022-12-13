@@ -58,6 +58,8 @@ void Player::processMouseMovement(float xOffset, float yOffset) {
   updatePlayerVectors();
 }
 
+void Player::applyForce(glm::vec3 &force) { position += force; }
+
 void Player::updatePlayerVectors() {
   glm::vec3 direction;
   direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
