@@ -1,4 +1,5 @@
 #include "intersection_util.h"
+#include "glm/geometric.hpp"
 #include "projection.h"
 #include <glm/glm.hpp>
 #include <vector>
@@ -30,6 +31,7 @@ IntersectionUtil::getSeparatingAxes(std::vector<glm::vec3> &triangle) {
   ca = triangle[0] - triangle[2];
 
   std::vector<glm::vec3> res;
+  res.push_back(glm::normalize(glm::cross(bc, ab)));
   res.push_back(glm::normalize(glm::cross(glm::cross(bc, ab), ab)));
   res.push_back(glm::normalize(glm::cross(glm::cross(ca, bc), bc)));
   res.push_back(glm::normalize(glm::cross(glm::cross(ab, ca), ca)));

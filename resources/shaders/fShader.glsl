@@ -12,7 +12,7 @@ void main()
         if (!intersectionDetected) {
             fragColor = texture(texture_diffuse1, texCoord);
         } else {
-            fragColor = texture(texture_diffuse1, texCoord) + vec4(1.0, 0.0, 0.0, 1.0);
+            fragColor = mix(texture(texture_diffuse1, texCoord), vec4(1.0, 0.0, 0.0, 1.0), 0.5f);
         }
     } else {
         fragColor = vec4(0, 1, 0.5, 0.2);
