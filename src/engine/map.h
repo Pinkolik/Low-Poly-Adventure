@@ -1,17 +1,18 @@
 #ifndef MAP_H
 #define MAP_H
+
 #include "model.h"
 
 class Map {
 public:
-  Map(Model &mapModel);
+    Map(Model &mapModel);
 
-  Model &getMapModel();
+    Model &getMapModel();
 
 private:
-  Model mapModel;
+    Model mapModel;
 
-  glm::vec3 getSpawnPos();
+    glm::vec3 getSpawnPos();
 };
 
 #endif

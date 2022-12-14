@@ -95,7 +95,9 @@ void mainLoop(GLFWwindow *window) {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    glm::vec3 gravity = glm::vec3(0, -0.01, 0);
     processInput(window, map, deltaTime);
+    player->applyForce(gravity);
 
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -111,19 +113,19 @@ void mainLoop(GLFWwindow *window) {
 
     map.draw(shader);
 
-    shader.setBool("debug", true);
-    std::vector<glm::vec3 *> mtvs =
-        map.getMinimumTranslationVec(player->getModel());
-    if (!mtvs.empty()) {
-      
-      for (unsigned int i = 0; i < mtvs.size(); i++) {
-        glm::vec3 *mtv = mtvs[i];
-        // std::cout << "applying force " << i << ": " << mtv->x << "," << mtv->y
-        //           << "," << mtv->z << std::endl;
+    while (true) {
+      glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel());
+      if (mtv != NULL && !(mtv->x == 0 && mtv->y == 0 && mtv->z == 0)) {
+        std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
+                  << mtv->z << std::endl;
         player->applyForce(*mtv);
         delete mtv;
+      } else {
+        break;
       }
     }
+
+    shader.setBool("debug", true);
     player->getModel().draw(shader);
     shader.setBool("debug", false);
 
@@ -140,6 +142,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     mainLoop(window);
   } catch (const std::exception &e) {

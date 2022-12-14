@@ -9,17 +9,17 @@
 #include "glm/trigonometric.hpp"
 
 Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
-      mouseSensitivity(SENSITIVITY), position(position), worldUp(up), yaw(yaw),
-      pitch(pitch),
-      model(Model(
-          "/home/pinkolik/Personal/game/resources/models/player/player.gltf")) {
+        : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
+          mouseSensitivity(SENSITIVITY), position(position), worldUp(up), yaw(yaw),
+          pitch(pitch),
+          model(Model(
+                  "/home/pinkolik/Personal/game/resources/models/player/player.gltf")) {
 
-  updatePlayerVectors();
+    updatePlayerVectors();
 }
 
 glm::mat4 Player::getViewMatrix() {
-  return glm::lookAt(position - front * 2.0f, position + front, worldUp);
+    return glm::lookAt(position - front * 2.0f, position + front, worldUp);
 }
 
 glm::vec3 Player::getPosition() { return position; }
@@ -27,51 +27,51 @@ glm::vec3 Player::getPosition() { return position; }
 glm::vec3 Player::getFront() { return front; }
 
 void Player::processKeyboard(GLFWwindow *window, Model &map, float deltaTime) {
-  float velocity = movementSpeed * deltaTime;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    position += front * velocity;
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    position -= front * velocity;
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    position -= right * velocity;
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    position += right * velocity;
-  }
+    float velocity = movementSpeed * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        position += front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        position -= front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        position -= right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        position += right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+    }
 }
 
 void Player::processMouseMovement(float xOffset, float yOffset) {
-  xOffset *= mouseSensitivity;
-  yOffset *= mouseSensitivity;
+    xOffset *= mouseSensitivity;
+    yOffset *= mouseSensitivity;
 
-  yaw += xOffset;
-  pitch += yOffset;
+    yaw += xOffset;
+    pitch += yOffset;
 
-  if (pitch > 89.0f) {
-    pitch = 89.0f;
-  } else if (pitch < -89.0f) {
-    pitch = -89.0f;
-  }
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    } else if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
 
-  updatePlayerVectors();
+    updatePlayerVectors();
 }
 
 void Player::applyForce(glm::vec3 &force) { position += force; }
 
 void Player::updatePlayerVectors() {
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = sin(glm::radians(pitch));
-  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  front = glm::normalize(direction);
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front = glm::normalize(direction);
 
-  right = glm::normalize(glm::cross(front, worldUp));
+    right = glm::normalize(glm::cross(front, worldUp));
 }
 
 Model &Player::getModel() {
-  model.setTranslation(position);
-  model.setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
-  return model;
+    model.setTranslation(position);
+    model.setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
+    return model;
 }
