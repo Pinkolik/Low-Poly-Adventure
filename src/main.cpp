@@ -76,12 +76,10 @@ void processInput(GLFWwindow *window) {
 }
 
 void mainLoop(GLFWwindow *window) {
-    Shader shader =
-            Shader("/home/pinkolik/Personal/game/resources/shaders/vShader.glsl",
-                   "/home/pinkolik/Personal/game/resources/shaders/fShader.glsl");
+    Shader shader = Shader("resources/shaders/vShader.glsl",
+                           "resources/shaders/fShader.glsl");
 
-    Model map =
-            Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
+    Model map = Model("resources/models/mall/mall.gltf");
     player = new Player(map.getSpawnPos());
     map.buffer();
     player->getModel().buffer();
