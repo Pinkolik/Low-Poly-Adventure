@@ -89,28 +89,28 @@ void Node::setRotation(glm::quat rotation) { position.rotation = rotation; }
 
 Mesh &Node::getMesh() { return mesh; }
 
-glm::vec3 *Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
-                                          PositionStruct otherModelPos) {
+std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
+                                                        PositionStruct otherModelPos) {
+    std::vector<glm::vec3 *> res;
     glm::mat4 modelMat = getModelMat(modelPos);
     glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
-    bool result = false;
     for (Primitive &primitive: mesh.getPrimitives()) {
         for (Primitive &otherPrimitive: other.mesh.getPrimitives()) {
-            glm::vec3 *mtv = primitive.getMinimumTranslationVec(
+            std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(
                     modelMat, otherPrimitive, otherModelMat);
-            if (mtv != NULL) {
+            if (!mtvs.empty()) {
                 intersectionDetected = true;
-                return mtv;
+                res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
         }
     }
 
     for (Node &childNode: children) {
-        glm::vec3 *mtv =
+        std::vector<glm::vec3 *> mtvs =
                 childNode.getMinimumTranslationVec(modelPos, other, otherModelPos);
-        if (mtv != NULL) {
-            return mtv;
+        if (!mtvs.empty()) {
+            res.insert(res.end(), mtvs.begin(), mtvs.end());
         }
     }
-    return NULL;
+    return res;
 }

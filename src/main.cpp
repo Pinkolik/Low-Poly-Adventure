@@ -69,12 +69,10 @@ void initGlad() {
     }
 }
 
-void processInput(GLFWwindow *window, Model &map, float deltaTime) {
+void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-
-    player->processKeyboard(window, map, deltaTime);
 }
 
 void mainLoop(GLFWwindow *window) {
@@ -95,14 +93,23 @@ void mainLoop(GLFWwindow *window) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        processInput(window);
 
         glm::vec3 gravity = glm::vec3(0, -0.01, 0);
-        processInput(window, map, deltaTime);
+        glm::vec3 move = player->processKeyboard(window, deltaTime);
         player->applyForce(gravity);
+        player->applyForce(move);
 
         while (true) {
-            glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel());
-            if (mtv != NULL && !(mtv->x == 0 && mtv->y == 0 && mtv->z == 0)) {
+            glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel(), gravity);
+            if (mtv != NULL) {
+                std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
+                          << mtv->z << std::endl;
+                player->applyForce(*mtv);
+                delete mtv;
+            }
+            mtv = map.getMinimumTranslationVec(player->getModel(), move);
+            if (mtv != NULL) {
                 std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
                           << mtv->z << std::endl;
                 player->applyForce(*mtv);

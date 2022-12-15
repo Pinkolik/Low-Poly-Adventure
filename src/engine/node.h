@@ -32,8 +32,8 @@ public:
 
     Mesh &getMesh();
 
-    glm::vec3 *getMinimumTranslationVec(PositionStruct modelPos, Node &other,
-                                        PositionStruct otherModelPos);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct modelPos, Node &other,
+                                                      PositionStruct otherModelPos);
 
 private:
     Mesh mesh;

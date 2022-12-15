@@ -52,9 +52,10 @@ Texture &Primitive::getTexture() { return texture; }
 
 std::vector<Vertex> &Primitive::getVertices() { return vertices; }
 
-glm::vec3 *Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
-                                               Primitive other,
-                                               glm::mat4 otherModelMat) {
+std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
+                                                             Primitive other,
+                                                             glm::mat4 otherModelMat) {
+    std::vector<glm::vec3 *> res;
     for (int i = 0; i < indices.size(); i += 3) {
         std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, modelMat);
         glm::vec3 firstTriangleNormal =
@@ -68,11 +69,12 @@ glm::vec3 *Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
                     firstTriangle, firstTriangleNormal, secondTriangle,
                     secondTriangleNormal);
             if (mtv != NULL) {
-                return mtv;
+                res.push_back(mtv);
+                break;
             }
         }
     }
-    return NULL;
+    return res;
 }
 
 std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,

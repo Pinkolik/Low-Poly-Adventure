@@ -30,15 +30,12 @@ glm::vec3 *IntersectionUtil::getMinimumTranslationVec(
             return NULL;
         }
         float intersectionLen = firstProj.findIntersectionLength(secondProj);
-        if (intersectionLen < 0.001f) {
-            return NULL;
-        }
         if (axis == firstTriangleNormal) {
             mtvAxis = axis;
             trans = intersectionLen;
         }
     }
-    return new glm::vec3(mtvAxis * trans * 1.1f);
+    return new glm::vec3(mtvAxis * trans * 1.5f);
 }
 
 std::vector<glm::vec3>

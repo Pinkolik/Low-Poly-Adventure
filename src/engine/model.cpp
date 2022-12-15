@@ -23,18 +23,32 @@ glm::vec3 Model::getSpawnPos() {
     return glm::vec3(0);
 }
 
-glm::vec3 *Model::getMinimumTranslationVec(Model &other) {
-    std::vector<glm::vec3 *> res;
+glm::vec3 *Model::getMinimumTranslationVec(Model &other, glm::vec3 direction) {
+    glm::vec3 *res = NULL;
+    float minDot = INFINITY;
+    int i = 0;
+    glm::vec3 normDir = glm::normalize(direction);
     for (auto &node: nodes) {
         for (auto &otherNode: other.nodes) {
-            glm::vec3 *mtv =
+            std::vector<glm::vec3 *> mtvs =
                     node.getMinimumTranslationVec(position, otherNode, other.position);
-            if (mtv != NULL) {
-                return mtv;
+            if (!mtvs.empty()) {
+                for (const auto &mtv: mtvs) {
+                    glm::vec3 normMtv = glm::normalize(*mtv);
+                    float dot = glm::dot(normDir, normMtv);
+                    std::cout << "dot " << i++ << " = " << dot << std::endl;
+                    if (dot < minDot) {
+                        minDot = dot;
+                        if (res != NULL) {
+                            delete res;
+                        }
+                        res = mtv;
+                    }
+                }
             }
         }
     }
-    return NULL;
+    return res;
 }
 
 void Model::buffer() {

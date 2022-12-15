@@ -26,20 +26,22 @@ glm::vec3 Player::getPosition() { return position; }
 
 glm::vec3 Player::getFront() { return front; }
 
-void Player::processKeyboard(GLFWwindow *window, Model &map, float deltaTime) {
+glm::vec3 Player::processKeyboard(GLFWwindow *window, float deltaTime) {
     float velocity = movementSpeed * deltaTime;
+    glm::vec3 res = glm::vec3(0);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        position += front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+        res += front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        position -= front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+        res -= front * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        position -= right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+        res -= right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        position += right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
+        res += right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
     }
+    return res;
 }
 
 void Player::processMouseMovement(float xOffset, float yOffset) {
