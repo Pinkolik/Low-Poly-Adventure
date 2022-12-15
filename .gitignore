@@ -4,3 +4,5 @@
 **/.cproject
 **/.project
 /.vscode
+/cmake-build-debug/
+/.idea

@@ -6,48 +6,49 @@
 #include <vector>
 
 glm::vec3 *IntersectionUtil::getMinimumTranslationVec(
-    std::vector<glm::vec3> &firstTriangle,
-    std::vector<glm::vec3> &firstTriangleNormals,
-    std::vector<glm::vec3> &secondTriangle,
-    std::vector<glm::vec3> &secondTriangleNormals) {
-  std::vector<glm::vec3> separatingAxes;
-  std::vector<glm::vec3> firstAxes = getSeparatingAxes(firstTriangle);
-  std::vector<glm::vec3> secondAxes = getSeparatingAxes(secondTriangle);
-  separatingAxes.insert(separatingAxes.end(), firstTriangleNormals.begin(),
-                        firstTriangleNormals.end());
-  separatingAxes.insert(separatingAxes.end(), secondTriangleNormals.begin(),
-                        secondTriangleNormals.end());
-  separatingAxes.insert(separatingAxes.end(), firstAxes.begin(),
-                        firstAxes.end());
-  separatingAxes.insert(separatingAxes.end(), secondAxes.begin(),
-                        secondAxes.end());
-  glm::vec3 minAxis;
-  float minTrans = INFINITY;
-  for (auto &axis : separatingAxes) {
-    Projection firstProj = Projection(axis, firstTriangle);
-    Projection secondProj = Projection(axis, secondTriangle);
-    if (!firstProj.isIntersecting(secondProj)) {
-      return NULL;
+        std::vector<glm::vec3> &firstTriangle,
+        glm::vec3 &firstTriangleNormal,
+        std::vector<glm::vec3> &secondTriangle,
+        glm::vec3 &secondTriangleNormal) {
+    std::vector<glm::vec3> separatingAxes;
+    std::vector<glm::vec3> firstAxes =
+            getSeparatingAxes(firstTriangle, firstTriangleNormal);
+    std::vector<glm::vec3> secondAxes =
+            getSeparatingAxes(secondTriangle, secondTriangleNormal);
+    separatingAxes.push_back(firstTriangleNormal);
+    separatingAxes.push_back(secondTriangleNormal);
+    separatingAxes.insert(separatingAxes.end(), firstAxes.begin(),
+                          firstAxes.end());
+    separatingAxes.insert(separatingAxes.end(), secondAxes.begin(),
+                          secondAxes.end());
+    float trans;
+    glm::vec3 mtvAxis;
+    for (auto &axis: separatingAxes) {
+        Projection firstProj = Projection(axis, firstTriangle);
+        Projection secondProj = Projection(axis, secondTriangle);
+        if (!firstProj.isIntersecting(secondProj)) {
+            return NULL;
+        }
+        float intersectionLen = firstProj.findIntersectionLength(secondProj);
+        if (axis == firstTriangleNormal) {
+            mtvAxis = axis;
+            trans = intersectionLen;
+        }
     }
-    float intersectionLen = firstProj.findIntersectionLength(secondProj);
-    if (intersectionLen < minTrans) {
-      minTrans = intersectionLen;
-      minAxis = axis;
-    }
-  }
-  return new glm::vec3(minAxis * minTrans);
+    return new glm::vec3(mtvAxis * trans * 1.5f);
 }
 
 std::vector<glm::vec3>
-IntersectionUtil::getSeparatingAxes(std::vector<glm::vec3> &triangle) {
-  glm::vec3 ab, bc, ca;
-  ab = triangle[1] - triangle[0];
-  bc = triangle[2] - triangle[1];
-  ca = triangle[0] - triangle[2];
+IntersectionUtil::getSeparatingAxes(std::vector<glm::vec3> &triangle,
+                                    glm::vec3 &normal) {
+    glm::vec3 ab, bc, ca;
+    ab = triangle[1] - triangle[0];
+    bc = triangle[2] - triangle[1];
+    ca = triangle[0] - triangle[2];
 
-  std::vector<glm::vec3> res;
-  res.push_back(glm::normalize(glm::cross(glm::cross(bc, ab), ab)));
-  res.push_back(glm::normalize(glm::cross(glm::cross(ca, bc), bc)));
-  res.push_back(glm::normalize(glm::cross(glm::cross(ab, ca), ca)));
-  return res;
+    std::vector<glm::vec3> res;
+    res.push_back(glm::normalize(glm::cross(normal, ab)));
+    res.push_back(glm::normalize(glm::cross(normal, bc)));
+    res.push_back(glm::normalize(glm::cross(normal, ca)));
+    return res;
 }

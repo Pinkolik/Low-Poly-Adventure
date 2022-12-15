@@ -1,5 +1,6 @@
 #ifndef MODEL_H
 #define MODEL_H
+
 #include "../helpers/tiny_gltf.h"
 #include "mesh.h"
 #include "node.h"
@@ -10,37 +11,43 @@
 
 class Model {
 public:
-  Model(const char *path);
+    Model(const char *path);
 
-  void buffer();
-  void draw(Shader &shader);
+    void buffer();
 
-  void setTranslation(glm::vec3 translation);
-  void setScale(glm::vec3 scale);
-  void setRotation(glm::quat rotation);
+    void draw(Shader &shader);
 
-  glm::vec3 getSpawnPos();
+    void setTranslation(glm::vec3 translation);
 
-  std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other);
+    void setScale(glm::vec3 scale);
+
+    void setRotation(glm::quat rotation);
+
+    glm::vec3 getSpawnPos();
+
+    glm::vec3 *getMinimumTranslationVec(Model &other, glm::vec3 direction);
 
 private:
-  std::vector<Node> nodes;
+    std::vector<Node> nodes;
 
-  PositionStruct position;
+    PositionStruct position;
 
-  void load(const char *path);
+    void load(const char *path);
 
-  Node processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode);
-  Mesh prcoessMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
-  Texture processTexture(tinygltf::Model &gltfModel,
-                         const unsigned int material);
+    Node processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode);
 
-  std::vector<std::vector<float>>
-  createFloatArrayVecctor(tinygltf::Model &gltfModel,
-                          const unsigned int accessor, size_t floatArrSize);
-  std::vector<unsigned short>
-  createUnsignedShortVector(tinygltf::Model &gltfModel,
-                            const unsigned int accessor);
+    Mesh processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
+
+    Texture processTexture(tinygltf::Model &gltfModel,
+                           const unsigned int material);
+
+    std::vector<std::vector<float>>
+    createFloatArrayVector(tinygltf::Model &gltfModel,
+                           const unsigned int accessor, size_t floatArrSize);
+
+    std::vector<unsigned short>
+    createUnsignedShortVector(tinygltf::Model &gltfModel,
+                              const unsigned int accessor);
 };
 
 #endif

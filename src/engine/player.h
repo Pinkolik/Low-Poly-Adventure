@@ -12,36 +12,42 @@ const float SENSITIVITY = 0.1f;
 
 class Player {
 public:
-  Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
-         float pitch = PITCH);
+    Player(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+           glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW,
+           float pitch = PITCH);
 
-  void processKeyboard(GLFWwindow *window, Model &map, float deltaTime);
-  void processMouseMovement(float xOffset, float yOffset);
-  void applyForce(glm::vec3 &force);
+    glm::vec3 processKeyboard(GLFWwindow *window, float deltaTime);
 
-  glm::mat4 getViewMatrix();
-  glm::vec3 getPosition();
-  glm::vec3 getFront();
-  Model &getModel();
+    void processMouseMovement(float xOffset, float yOffset);
+
+    void applyForce(glm::vec3 &force);
+
+    glm::mat4 getViewMatrix();
+
+    glm::vec3 getPosition();
+
+    glm::vec3 getFront();
+
+    Model &getModel();
 
 private:
-  glm::vec3 position;
-  glm::vec3 front;
-  glm::vec3 right;
-  glm::vec3 worldUp;
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 right;
+    glm::vec3 worldUp;
 
-  float yaw;
-  float pitch;
+    float yaw;
+    float pitch;
 
-  float movementSpeed;
-  float mouseSensitivity;
-  float fallTime;
-  float lastPressTime = 0;
+    float movementSpeed;
+    float mouseSensitivity;
+    float fallTime;
+    float lastPressTime = 0;
 
-  bool thirdPerson = false;
-  Model model;
+    bool thirdPerson = false;
+    Model model;
 
-  void updatePlayerVectors();
+    void updatePlayerVectors();
 };
+
 #endif

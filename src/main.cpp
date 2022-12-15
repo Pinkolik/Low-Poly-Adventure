@@ -20,131 +20,150 @@ int height = 900;
 Player *player;
 
 void resizeCallback(GLFWwindow *window, int newWidth, int newHeight) {
-  glViewport(0, 0, newWidth, newHeight);
-  width = newHeight;
-  height = newHeight;
+    glViewport(0, 0, newWidth, newHeight);
+    width = newHeight;
+    height = newHeight;
 }
 
 bool firstMouse = true;
 float lastX, lastY;
+
 void mouseCallback(GLFWwindow *window, double xPos, double yPos) {
-  if (firstMouse) {
+    if (firstMouse) {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+
+    float xOffset = xPos - lastX;
+    float yOffset = lastY - yPos;
     lastX = xPos;
     lastY = yPos;
-    firstMouse = false;
-  }
-
-  float xOffset = xPos - lastX;
-  float yOffset = lastY - yPos;
-  lastX = xPos;
-  lastY = yPos;
-  player->processMouseMovement(xOffset, yOffset);
+    player->processMouseMovement(xOffset, yOffset);
 }
 
 void scrollCallback(GLFWwindow *window, double xOffset, double yOffset) {}
 
 GLFWwindow *createWindow() {
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow *window =
-      glfwCreateWindow(width, height, "Untitled Game", NULL, NULL);
-  if (window == NULL) {
-    throw std::runtime_error("Failed to initialize window");
-  }
-  glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, resizeCallback);
-  glfwSetScrollCallback(window, scrollCallback);
-  glfwSetCursorPosCallback(window, mouseCallback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  return window;
+    GLFWwindow *window =
+            glfwCreateWindow(width, height, "Untitled Game", NULL, NULL);
+    if (window == NULL) {
+        throw std::runtime_error("Failed to initialize window");
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, resizeCallback);
+    glfwSetScrollCallback(window, scrollCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    return window;
 }
 
 void initGlad() {
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    throw std::runtime_error("Failed to initialize GLAD");
-  }
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        throw std::runtime_error("Failed to initialize GLAD");
+    }
 }
 
-void processInput(GLFWwindow *window, Model &map, float deltaTime) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
-
-  player->processKeyboard(window, map, deltaTime);
+void processInput(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
 
 void mainLoop(GLFWwindow *window) {
-  Shader shader =
-      Shader("/home/pinkolik/Personal/game/resources/shaders/vShader.glsl",
-             "/home/pinkolik/Personal/game/resources/shaders/fShader.glsl");
+    Shader shader =
+            Shader("/home/pinkolik/Personal/game/resources/shaders/vShader.glsl",
+                   "/home/pinkolik/Personal/game/resources/shaders/fShader.glsl");
 
-  Model map =
-      Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
-  player = new Player(map.getSpawnPos());
-  map.buffer();
-  player->getModel().buffer();
+    Model map =
+            Model("/home/pinkolik/Personal/game/resources/models/mall/mall.gltf");
+    player = new Player(map.getSpawnPos());
+    map.buffer();
+    player->getModel().buffer();
 
-  // timing
-  float deltaTime = 0.0f; // time between current frame and last frame
-  float lastFrame = 0.0f;
-  while (!glfwWindowShouldClose(window)) {
-    float currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    // timing
+    float deltaTime = 0.0f; // time between current frame and last frame
+    float lastFrame = 0.0f;
+    float fallCoefficient = 1.0f;
+    while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        processInput(window);
 
-    processInput(window, map, deltaTime);
+        glm::vec3 gravity = glm::vec3(0, -0.02 * fallCoefficient * fallCoefficient, 0);
+        std::cout << "fall coeff " << fallCoefficient << std::endl;
+        glm::vec3 move = player->processKeyboard(window, deltaTime);
+        player->applyForce(gravity);
+        player->applyForce(move);
 
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        bool first = true;
+        while (true) {
+            glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel(), gravity);
+            if (mtv != NULL) {
+                std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
+                          << mtv->z << std::endl;
+                player->applyForce(*mtv);
+                delete mtv;
+                fallCoefficient = 1.0f;
+            } else if (first) {
+                fallCoefficient += deltaTime;
+                first = false;
+            }
+            mtv = map.getMinimumTranslationVec(player->getModel(), move);
+            if (mtv != NULL) {
+                std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
+                          << mtv->z << std::endl;
+                player->applyForce(*mtv);
+                delete mtv;
+            } else {
+                break;
+            }
+        }
 
-    shader.use();
-    shader.setBool("debug", false);
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-    shader.setMatrix4f("projection", projection);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 view = player->getViewMatrix();
-    shader.setMatrix4f("view", view);
+        shader.use();
+        shader.setBool("debug", false);
+        glm::mat4 projection = glm::perspective(
+                glm::radians(45.0f), (float) width / (float) height, 0.1f, 100.0f);
+        shader.setMatrix4f("projection", projection);
 
-    map.draw(shader);
+        glm::mat4 view = player->getViewMatrix();
+        shader.setMatrix4f("view", view);
 
-    shader.setBool("debug", true);
-    std::vector<glm::vec3 *> mtvs =
-        map.getMinimumTranslationVec(player->getModel());
-    if (!mtvs.empty()) {
-      
-      for (unsigned int i = 0; i < mtvs.size(); i++) {
-        glm::vec3 *mtv = mtvs[i];
-        // std::cout << "applying force " << i << ": " << mtv->x << "," << mtv->y
-        //           << "," << mtv->z << std::endl;
-        player->applyForce(*mtv);
-        delete mtv;
-      }
+        map.draw(shader);
+
+        shader.setBool("debug", true);
+        player->getModel().draw(shader);
+        shader.setBool("debug", false);
+
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
-    player->getModel().draw(shader);
-    shader.setBool("debug", false);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
 }
 
 int main() {
-  try {
-    GLFWwindow *window = createWindow();
-    initGlad();
-    glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    try {
+        GLFWwindow *window = createWindow();
+        initGlad();
+        glViewport(0, 0, width, height);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    mainLoop(window);
-  } catch (const std::exception &e) {
-    std::cout << e.what() << std::endl;
-    return -1;
-  }
-  return 0;
+        mainLoop(window);
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+        return -1;
+    }
+    return 0;
 }
