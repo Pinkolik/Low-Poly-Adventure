@@ -12,8 +12,7 @@ Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
         : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
           mouseSensitivity(SENSITIVITY), position(position), worldUp(up), yaw(yaw),
           pitch(pitch),
-          model(Model(
-                  "/home/pinkolik/Personal/game/resources/models/player/player.gltf")) {
+          model(Model("resources/models/player/player.gltf")) {
 
     updatePlayerVectors();
 }

@@ -38,5 +38,10 @@ add_executable(Game
         src/engine/intersection/projection.h
         src/engine/intersection/projection.cpp
         )
+add_custom_command(
+        TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/resources
+        ${PROJECT_BINARY_DIR}/resources)
 target_link_libraries(Game PUBLIC glfw glm)
 target_include_directories(Game PUBLIC include)
