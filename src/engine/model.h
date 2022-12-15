@@ -36,7 +36,7 @@ private:
 
     Node processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode);
 
-    Mesh prcoessMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
+    Mesh processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
 
     Texture processTexture(tinygltf::Model &gltfModel,
                            const unsigned int material);

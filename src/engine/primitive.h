@@ -31,7 +31,7 @@ private:
 
     std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 modelMat);
 
-    std::vector<glm::vec3> getTriangleNormals(int idx, glm::mat4 modelMat);
+    glm::vec3 getTriangleNormal(int idx, glm::mat4 modelMat);
 };
 
 #endif

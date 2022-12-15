@@ -36,7 +36,7 @@ void Primitive::buffer() {
                           (void *) offsetof(Vertex, normal));
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *) offsetof(Vertex, texcoord));
+                          (void *) offsetof(Vertex, texCoord));
 
     glBindVertexArray(0);
 }
@@ -55,18 +55,18 @@ std::vector<Vertex> &Primitive::getVertices() { return vertices; }
 glm::vec3 *Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
                                                Primitive other,
                                                glm::mat4 otherModelMat) {
-    for (int i = 0; i < indices.size(); i += 2) {
+    for (int i = 0; i < indices.size(); i += 3) {
         std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, modelMat);
-        std::vector<glm::vec3> firstTriangleNormals =
-                getTriangleNormals(i, modelMat);
-        for (int j = 0; j < other.indices.size(); j += 2) {
+        glm::vec3 firstTriangleNormal =
+                getTriangleNormal(i, modelMat);
+        for (int j = 0; j < other.indices.size(); j += 3) {
             std::vector<glm::vec3> secondTriangle =
                     other.getTriangleVertices(j, otherModelMat);
-            std::vector<glm::vec3> secondTriangleNormals =
-                    other.getTriangleNormals(j, otherModelMat);
+            glm::vec3 secondTriangleNormal =
+                    other.getTriangleNormal(j, otherModelMat);
             glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(
-                    firstTriangle, firstTriangleNormals, secondTriangle,
-                    secondTriangleNormals);
+                    firstTriangle, firstTriangleNormal, secondTriangle,
+                    secondTriangleNormal);
             if (mtv != NULL) {
                 return mtv;
             }
@@ -87,14 +87,8 @@ std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,
     return triangle;
 }
 
-std::vector<glm::vec3> Primitive::getTriangleNormals(int idx,
-                                                     glm::mat4 modelMat) {
-    std::vector<glm::vec3> normals;
-    normals.push_back(glm::inverseTranspose(glm::mat3(modelMat)) *
-                      vertices[indices[idx]].normal);
-    normals.push_back(glm::inverseTranspose(glm::mat3(modelMat)) *
-                      vertices[indices[idx + 1]].normal);
-    normals.push_back(glm::inverseTranspose(glm::mat3(modelMat)) *
-                      vertices[indices[idx + 2]].normal);
-    return normals;
+glm::vec3 Primitive::getTriangleNormal(int idx,
+                                       glm::mat4 modelMat) {
+    return glm::normalize(glm::inverseTranspose(glm::mat3(modelMat)) *
+                          vertices[indices[idx]].normal);
 }

@@ -87,7 +87,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     std::vector<double> translation = gltfNode.translation;
 
     tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
-    Mesh mesh = prcoessMesh(gltfModel, gltfMesh);
+    Mesh mesh = processMesh(gltfModel, gltfMesh);
 
     Node node = Node(rotation, scale, translation, mesh);
     for (size_t i = 0; i < gltfNode.children.size(); i++) {
@@ -98,7 +98,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     return node;
 }
 
-Mesh Model::prcoessMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
+Mesh Model::processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
     std::vector<Primitive> primitives;
     for (size_t i = 0; i < gltfMesh.primitives.size(); i++) {
         tinygltf::Primitive &gltfPrimitive = gltfMesh.primitives[i];
