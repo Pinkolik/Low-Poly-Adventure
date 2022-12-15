@@ -89,17 +89,20 @@ void mainLoop(GLFWwindow *window) {
     // timing
     float deltaTime = 0.0f; // time between current frame and last frame
     float lastFrame = 0.0f;
+    float fallCoefficient = 1.0f;
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
 
-        glm::vec3 gravity = glm::vec3(0, -0.01, 0);
+        glm::vec3 gravity = glm::vec3(0, -0.02 * fallCoefficient * fallCoefficient, 0);
+        std::cout << "fall coeff " << fallCoefficient << std::endl;
         glm::vec3 move = player->processKeyboard(window, deltaTime);
         player->applyForce(gravity);
         player->applyForce(move);
 
+        bool first = true;
         while (true) {
             glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel(), gravity);
             if (mtv != NULL) {
@@ -107,6 +110,10 @@ void mainLoop(GLFWwindow *window) {
                           << mtv->z << std::endl;
                 player->applyForce(*mtv);
                 delete mtv;
+                fallCoefficient = 1.0f;
+            } else if (first) {
+                fallCoefficient += deltaTime;
+                first = false;
             }
             mtv = map.getMinimumTranslationVec(player->getModel(), move);
             if (mtv != NULL) {
