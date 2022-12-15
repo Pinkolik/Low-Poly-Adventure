@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 
-add_subdirectory(glfw)
-add_subdirectory(glm)
+add_subdirectory(dependencies/glfw)
+add_subdirectory(dependencies/glm)
 
 # file(COPY resources/shaders resources/textures DESTINATION resources)
 
