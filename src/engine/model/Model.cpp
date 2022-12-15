@@ -1,6 +1,6 @@
-#include "model.h"
+#include "Model.h"
 
-#include "vertex.h"
+#include "Vertex.h"
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -9,7 +9,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "../helpers/tiny_gltf.h"
+#include "../../helpers/tiny_gltf.h"
 
 Model::Model(const char *path) { load(path); }
 
@@ -24,7 +24,7 @@ glm::vec3 Model::getSpawnPos() {
 }
 
 glm::vec3 *Model::getMinimumTranslationVec(Model &other, glm::vec3 direction) {
-    glm::vec3 *res = NULL;
+    glm::vec3 *res = nullptr;
     float minDot = INFINITY;
     int i = 0;
     glm::vec3 normDir = glm::normalize(direction);
@@ -39,7 +39,7 @@ glm::vec3 *Model::getMinimumTranslationVec(Model &other, glm::vec3 direction) {
                     std::cout << "dot " << i++ << " = " << dot << std::endl;
                     if (dot < minDot) {
                         minDot = dot;
-                        if (res != NULL) {
+                        if (res != nullptr) {
                             delete res;
                         }
                         res = mtv;
@@ -88,8 +88,8 @@ void Model::load(const char *path) {
     }
 
     tinygltf::Scene &scene = gltfModel.scenes[gltfModel.defaultScene];
-    for (size_t i = 0; i < scene.nodes.size(); i++) {
-        tinygltf::Node &gltfNode = gltfModel.nodes[scene.nodes[i]];
+    for (int i : scene.nodes) {
+        tinygltf::Node &gltfNode = gltfModel.nodes[i];
         Node node = processNode(gltfModel, gltfNode);
         nodes.push_back(node);
     }
@@ -104,8 +104,8 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     Mesh mesh = processMesh(gltfModel, gltfMesh);
 
     Node node = Node(rotation, scale, translation, mesh);
-    for (size_t i = 0; i < gltfNode.children.size(); i++) {
-        tinygltf::Node &gltfChildNode = gltfModel.nodes[gltfNode.children[i]];
+    for (int i : gltfNode.children) {
+        tinygltf::Node &gltfChildNode = gltfModel.nodes[i];
         Node childNode = processNode(gltfModel, gltfChildNode);
         node.addChild(childNode);
     }
@@ -114,20 +114,18 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
 
 Mesh Model::processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
     std::vector<Primitive> primitives;
-    for (size_t i = 0; i < gltfMesh.primitives.size(); i++) {
-        tinygltf::Primitive &gltfPrimitive = gltfMesh.primitives[i];
-
+    for (auto & gltfPrimitive : gltfMesh.primitives) {
         std::vector<std::vector<float>> normals;
         std::vector<std::vector<float>> positions;
         std::vector<std::vector<float>> texcoord;
         for (auto &attrib: gltfPrimitive.attributes) {
             std::cout << attrib.first << std::endl;
             unsigned int accessor = attrib.second;
-            if (attrib.first.compare("NORMAL") == 0) {
+            if (attrib.first == "NORMAL") {
                 normals = createFloatArrayVector(gltfModel, accessor, 3);
-            } else if (attrib.first.compare("POSITION") == 0) {
+            } else if (attrib.first == "POSITION") {
                 positions = createFloatArrayVector(gltfModel, accessor, 3);
-            } else if (attrib.first.compare("TEXCOORD_0") == 0) {
+            } else if (attrib.first == "TEXCOORD_0") {
                 texcoord = createFloatArrayVector(gltfModel, accessor, 2);
             }
         }
@@ -136,7 +134,7 @@ Mesh Model::processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
 
         std::vector<Vertex> vertices;
         for (size_t j = 0; j < normals.size(); j++) {
-            Vertex vertex;
+            Vertex vertex{};
             vertex.position =
                     glm::vec3(positions[j][0], positions[j][1], positions[j][2]);
             vertex.normal = glm::vec3(normals[j][0], normals[j][1], normals[j][2]);

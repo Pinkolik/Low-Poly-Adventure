@@ -1,6 +1,6 @@
-#include "intersection_util.h"
+#include "IntersectionUtil.h"
 #include "glm/geometric.hpp"
-#include "projection.h"
+#include "Projection.h"
 #include <cmath>
 #include <glm/glm.hpp>
 #include <vector>
@@ -27,7 +27,7 @@ glm::vec3 *IntersectionUtil::getMinimumTranslationVec(
         Projection firstProj = Projection(axis, firstTriangle);
         Projection secondProj = Projection(axis, secondTriangle);
         if (!firstProj.isIntersecting(secondProj)) {
-            return NULL;
+            return nullptr;
         }
         float intersectionLen = firstProj.findIntersectionLength(secondProj);
         if (axis == firstTriangleNormal) {

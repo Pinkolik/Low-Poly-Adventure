@@ -9,10 +9,6 @@ class Projection {
 public:
     Projection(glm::vec3 axis, std::vector<glm::vec3> &triangle);
 
-    float getMin();
-
-    float getMax();
-
     bool isIntersecting(Projection &other);
 
     float findIntersectionLength(Projection &other);

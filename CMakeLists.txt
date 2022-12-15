@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 
-add_subdirectory(glfw)
-add_subdirectory(glm)
+add_subdirectory(dependencies/glfw)
+add_subdirectory(dependencies/glm)
 
 # file(COPY resources/shaders resources/textures DESTINATION resources)
 
@@ -18,26 +18,26 @@ add_executable(Game
         src/helpers/stb_image_write.h
         src/helpers/json.hpp
         src/helpers/tiny_gltf.h
-        src/engine/shader.h
-        src/engine/shader.cpp
-        src/engine/mesh.h
-        src/engine/mesh.cpp
-        src/engine/map.cpp
-        src/engine/map.h
-        src/engine/model.cpp
-        src/engine/model.h
-        src/engine/node.h
-        src/engine/node.cpp
-        src/engine/primitive.h
-        src/engine/primitive.cpp
-        src/engine/position_struct.h
-        src/engine/player.h
-        src/engine/player.cpp
-        src/engine/intersection/intersection_util.h
-        src/engine/intersection/intersection_util.cpp
-        src/engine/intersection/projection.h
-        src/engine/intersection/projection.cpp
-        )
+        src/shader/Shader.h
+        src/shader/Shader.cpp
+        src/engine/model/Mesh.h
+        src/engine/model/Mesh.cpp
+        src/engine/map/Map.cpp
+        src/engine/map/Map.h
+        src/engine/model/Model.cpp
+        src/engine/model/Model.h
+        src/engine/model/Node.h
+        src/engine/model/Node.cpp
+        src/engine/model/Primitive.h
+        src/engine/model/Primitive.cpp
+        src/engine/model/PositionStruct.h
+        src/engine/player/Player.h
+        src/engine/player/Player.cpp
+        src/engine/intersection/IntersectionUtil.h
+        src/engine/intersection/IntersectionUtil.cpp
+        src/engine/intersection/Projection.h
+        src/engine/intersection/Projection.cpp
+        src/engine/game/GameInstance.cpp src/engine/game/GameInstance.h)
 add_custom_command(
         TARGET Game POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

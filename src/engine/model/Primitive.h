@@ -2,9 +2,9 @@
 #define PRIMITIVE_H
 
 #include "glm/fwd.hpp"
-#include "shader.h"
-#include "texture.h"
-#include "vertex.h"
+#include "../../shader/Shader.h"
+#include "Texture.h"
+#include "Vertex.h"
 #include <vector>
 
 class Primitive {
@@ -21,10 +21,10 @@ public:
 
     Texture &getTexture();
 
-    std::vector<Vertex> &getVertices();
-
 private:
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
     Texture texture;

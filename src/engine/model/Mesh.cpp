@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "Mesh.h"
 
 Mesh::Mesh(std::vector<Primitive> &primitives) : primitives(primitives) {}
 
