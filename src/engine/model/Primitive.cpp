@@ -1,6 +1,6 @@
-#include "primitive.h"
-#include "../intersection/intersection_util.h"
-#include "texture.h"
+#include "Primitive.h"
+#include "../intersection/IntersectionUtil.h"
+#include "Texture.h"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/vec3.hpp"
 
@@ -9,20 +9,20 @@ Primitive::Primitive(std::vector<Vertex> &vertices,
         : vertices(vertices), indices(indices), texture(texture) {}
 
 void Primitive::buffer() {
-    unsigned int VAO, VBO, EBO;
+    unsigned int newVAO, newVBO, newEBO;
 
-    glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &newVAO);
 
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    this->VAO = VAO;
-    this->VBO = VBO;
-    this->EBO = EBO;
+    glGenBuffers(1, &newVBO);
+    glGenBuffers(1, &newEBO);
+    this->VAO = newVAO;
+    this->VBO = newVBO;
+    this->EBO = newEBO;
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(newVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newEBO);
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
                  vertices.data(), GL_STATIC_DRAW);
@@ -30,7 +30,7 @@ void Primitive::buffer() {
                  indices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *) offsetof(Vertex, normal));
@@ -45,12 +45,10 @@ void Primitive::draw(Shader &shader) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture.id);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, nullptr);
 }
 
 Texture &Primitive::getTexture() { return texture; }
-
-std::vector<Vertex> &Primitive::getVertices() { return vertices; }
 
 std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
                                                              Primitive other,
@@ -68,7 +66,7 @@ std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
             glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(
                     firstTriangle, firstTriangleNormal, secondTriangle,
                     secondTriangleNormal);
-            if (mtv != NULL) {
+            if (mtv != nullptr) {
                 res.push_back(mtv);
                 break;
             }
@@ -80,12 +78,12 @@ std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
 std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,
                                                       glm::mat4 modelMat) {
     std::vector<glm::vec3> triangle;
-    triangle.push_back(modelMat *
-                       glm::vec4(vertices[indices[idx]].position, 1.0f));
-    triangle.push_back(modelMat *
-                       glm::vec4(vertices[indices[idx + 1]].position, 1.0f));
-    triangle.push_back(modelMat *
-                       glm::vec4(vertices[indices[idx + 2]].position, 1.0f));
+    triangle.emplace_back(modelMat *
+                          glm::vec4(vertices[indices[idx]].position, 1.0f));
+    triangle.emplace_back(modelMat *
+                          glm::vec4(vertices[indices[idx + 1]].position, 1.0f));
+    triangle.emplace_back(modelMat *
+                          glm::vec4(vertices[indices[idx + 2]].position, 1.0f));
     return triangle;
 }
 

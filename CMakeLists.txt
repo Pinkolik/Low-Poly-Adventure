@@ -18,26 +18,26 @@ add_executable(Game
         src/helpers/stb_image_write.h
         src/helpers/json.hpp
         src/helpers/tiny_gltf.h
-        src/shader/shader.h
-        src/shader/shader.cpp
-        src/engine/model/mesh.h
-        src/engine/model/mesh.cpp
-        src/engine/map/map.cpp
-        src/engine/map/map.h
-        src/engine/model/model.cpp
-        src/engine/model/model.h
-        src/engine/model/node.h
-        src/engine/model/node.cpp
-        src/engine/model/primitive.h
-        src/engine/model/primitive.cpp
-        src/engine/model/position_struct.h
-        src/engine/player/player.h
-        src/engine/player/player.cpp
-        src/engine/intersection/intersection_util.h
-        src/engine/intersection/intersection_util.cpp
-        src/engine/intersection/projection.h
-        src/engine/intersection/projection.cpp
-        )
+        src/shader/Shader.h
+        src/shader/Shader.cpp
+        src/engine/model/Mesh.h
+        src/engine/model/Mesh.cpp
+        src/engine/map/Map.cpp
+        src/engine/map/Map.h
+        src/engine/model/Model.cpp
+        src/engine/model/Model.h
+        src/engine/model/Node.h
+        src/engine/model/Node.cpp
+        src/engine/model/Primitive.h
+        src/engine/model/Primitive.cpp
+        src/engine/model/PositionStruct.h
+        src/engine/player/Player.h
+        src/engine/player/Player.cpp
+        src/engine/intersection/IntersectionUtil.h
+        src/engine/intersection/IntersectionUtil.cpp
+        src/engine/intersection/Projection.h
+        src/engine/intersection/Projection.cpp
+        src/engine/game/GameInstance.cpp src/engine/game/GameInstance.h)
 add_custom_command(
         TARGET Game POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

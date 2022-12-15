@@ -1,12 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "primitive.h"
+#include "Primitive.h"
 #include <vector>
 
 class Mesh {
 public:
-    Mesh(std::vector<Primitive> &primitives);
+    explicit Mesh(std::vector<Primitive> &primitives);
 
     std::vector<Primitive> &getPrimitives();
 

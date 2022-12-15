@@ -1,9 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "mesh.h"
-#include "position_struct.h"
-#include "../shader/shader.h"
+#include "Mesh.h"
+#include "PositionStruct.h"
+#include "../../shader/Shader.h"
 #include "glm/vec3.hpp"
 #include <vector>
 
@@ -14,23 +14,13 @@ public:
 
     void buffer();
 
-    void draw(Shader &shader);
-
     void draw(Shader &shader, PositionStruct modelPos);
 
     void addChild(Node &child);
 
-    bool isSpawn();
+    bool isSpawn() const;
 
-    void setTranslation(glm::vec3 translation);
-
-    void setScale(glm::vec3 scale);
-
-    void setRotation(glm::quat rotation);
-
-    glm::vec3 getTranslation();
-
-    Mesh &getMesh();
+    glm::vec3 getTranslation() const;
 
     std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct modelPos, Node &other,
                                                       PositionStruct otherModelPos);
@@ -44,9 +34,7 @@ private:
     bool spawn = false;
     bool intersectionDetected = false;
 
-    glm::mat4 getModelMat();
-
-    glm::mat4 getModelMat(PositionStruct modelPos);
+    glm::mat4 getModelMat(PositionStruct modelPos) const;
 };
 
 #endif

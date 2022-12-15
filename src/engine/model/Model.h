@@ -2,16 +2,16 @@
 #define MODEL_H
 
 #include "../../helpers/tiny_gltf.h"
-#include "mesh.h"
-#include "node.h"
-#include "position_struct.h"
-#include "primitive.h"
-#include "../shader/shader.h"
+#include "Mesh.h"
+#include "Node.h"
+#include "PositionStruct.h"
+#include "Primitive.h"
+#include "../../shader/Shader.h"
 #include <vector>
 
 class Model {
 public:
-    Model(const char *path);
+    explicit Model(const char *path);
 
     void buffer();
 
@@ -38,16 +38,16 @@ private:
 
     Mesh processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
 
-    Texture processTexture(tinygltf::Model &gltfModel,
-                           const unsigned int material);
+    static Texture processTexture(tinygltf::Model &gltfModel,
+                                  unsigned int material);
 
-    std::vector<std::vector<float>>
+    static std::vector<std::vector<float>>
     createFloatArrayVector(tinygltf::Model &gltfModel,
-                           const unsigned int accessor, size_t floatArrSize);
+                           unsigned int accessor, size_t floatArrSize);
 
     std::vector<unsigned short>
     createUnsignedShortVector(tinygltf::Model &gltfModel,
-                              const unsigned int accessor);
+                              unsigned int accessor);
 };
 
 #endif

@@ -3,12 +3,10 @@
 // Windows initialization
 #include <GLFW/glfw3.h>
 // Engine
-#include "engine/model/model.h"
-#include "engine/player/player.h"
-#include "engine/shader/shader.h"
+#include "engine/model/Model.h"
+#include "engine/player/Player.h"
+#include "engine/game/GameInstance.h"
 // GLM
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
 // C++
 #include <exception>
@@ -17,12 +15,13 @@
 
 int width = 1600;
 int height = 900;
-Player *player;
+GameInstance *gameInstance;
 
 void resizeCallback(GLFWwindow *window, int newWidth, int newHeight) {
     glViewport(0, 0, newWidth, newHeight);
     width = newHeight;
     height = newHeight;
+    gameInstance->processResize(newWidth, newHeight);
 }
 
 bool firstMouse = true;
@@ -39,10 +38,9 @@ void mouseCallback(GLFWwindow *window, double xPos, double yPos) {
     float yOffset = lastY - yPos;
     lastX = xPos;
     lastY = yPos;
-    player->processMouseMovement(xOffset, yOffset);
+    gameInstance->processMouseMovement(xOffset, yOffset);
 }
 
-void scrollCallback(GLFWwindow *window, double xOffset, double yOffset) {}
 
 GLFWwindow *createWindow() {
     glfwInit();
@@ -51,13 +49,12 @@ GLFWwindow *createWindow() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow *window =
-            glfwCreateWindow(width, height, "Untitled Game", NULL, NULL);
-    if (window == NULL) {
+            glfwCreateWindow(width, height, "Untitled Game", nullptr, nullptr);
+    if (window == nullptr) {
         throw std::runtime_error("Failed to initialize window");
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, resizeCallback);
-    glfwSetScrollCallback(window, scrollCallback);
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     return window;
@@ -76,72 +73,24 @@ void processInput(GLFWwindow *window) {
 }
 
 void mainLoop(GLFWwindow *window) {
-    Shader shader = Shader("resources/shaders/vShader.glsl",
-                           "resources/shaders/fShader.glsl");
-
-    Model map = Model("resources/models/mall/mall.gltf");
-    player = new Player(map.getSpawnPos());
-    map.buffer();
-    player->getModel().buffer();
+    gameInstance = new GameInstance("resources/models/mall/mall.gltf", "resources/models/player/player.gltf", width,
+                                    height);
 
     // timing
-    float deltaTime = 0.0f; // time between current frame and last frame
+    float deltaTime; // time between current frame and last frame
     float lastFrame = 0.0f;
-    float fallCoefficient = 1.0f;
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
 
-        glm::vec3 gravity = glm::vec3(0, -0.02 * fallCoefficient * fallCoefficient, 0);
-        std::cout << "fall coeff " << fallCoefficient << std::endl;
-        glm::vec3 move = player->processKeyboard(window, deltaTime);
-        player->applyForce(gravity);
-        player->applyForce(move);
-
-        bool first = true;
-        while (true) {
-            glm::vec3 *mtv = map.getMinimumTranslationVec(player->getModel(), gravity);
-            if (mtv != NULL) {
-                std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
-                          << mtv->z << std::endl;
-                player->applyForce(*mtv);
-                delete mtv;
-                fallCoefficient = 1.0f;
-            } else if (first) {
-                fallCoefficient += deltaTime;
-                first = false;
-            }
-            mtv = map.getMinimumTranslationVec(player->getModel(), move);
-            if (mtv != NULL) {
-                std::cout << "applying force: " << mtv->x << "," << mtv->y << ","
-                          << mtv->z << std::endl;
-                player->applyForce(*mtv);
-                delete mtv;
-            } else {
-                break;
-            }
-        }
+        gameInstance->tick(window, deltaTime);
 
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader.use();
-        shader.setBool("debug", false);
-        glm::mat4 projection = glm::perspective(
-                glm::radians(45.0f), (float) width / (float) height, 0.1f, 100.0f);
-        shader.setMatrix4f("projection", projection);
-
-        glm::mat4 view = player->getViewMatrix();
-        shader.setMatrix4f("view", view);
-
-        map.draw(shader);
-
-        shader.setBool("debug", true);
-        player->getModel().draw(shader);
-        shader.setBool("debug", false);
-
+        gameInstance->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

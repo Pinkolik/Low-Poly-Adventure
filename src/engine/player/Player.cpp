@@ -1,4 +1,4 @@
-#include "player.h"
+#include "Player.h"
 
 #include "GLFW/glfw3.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -7,15 +7,6 @@
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
-
-Player::Player(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-        : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED),
-          mouseSensitivity(SENSITIVITY), position(position), worldUp(up), yaw(yaw),
-          pitch(pitch),
-          model(Model("resources/models/player/player.gltf")) {
-
-    updatePlayerVectors();
-}
 
 glm::mat4 Player::getViewMatrix() {
     return glm::lookAt(position - front * 2.0f, position + front, worldUp);
@@ -75,4 +66,18 @@ Model &Player::getModel() {
     model.setTranslation(position);
     model.setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
     return model;
+}
+
+Player::Player(const char *playerModelPath, glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
+        front(glm::vec3(0.0f, 0.0f, -1.0f)),
+        movementSpeed(SPEED),
+        mouseSensitivity(SENSITIVITY),
+        position(position),
+        worldUp(up),
+        yaw(yaw),
+        pitch(pitch),
+        model(Model(playerModelPath)) {
+
+    updatePlayerVectors();
+    model.buffer();
 }

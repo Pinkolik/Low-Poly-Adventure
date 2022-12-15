@@ -1,4 +1,4 @@
-#include "projection.h"
+#include "Projection.h"
 #include <cmath>
 #include <glm/glm.hpp>
 
@@ -13,10 +13,6 @@ Projection::Projection(glm::vec3 axis, std::vector<glm::vec3> &triangle) {
         }
     }
 }
-
-float Projection::getMin() { return min; }
-
-float Projection::getMax() { return max; }
 
 bool Projection::isIntersecting(Projection &other) {
     if (min < other.max) {
