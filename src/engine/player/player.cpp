@@ -1,7 +1,7 @@
 #include "player.h"
 
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
+#include "GLFW/glfw3.h"
+#include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
 
 #include "glm/fwd.hpp"

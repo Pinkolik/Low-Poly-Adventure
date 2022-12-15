@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "model.h"
+#include "../model/model.h"
 
 class Map {
 public:

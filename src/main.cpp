@@ -3,9 +3,9 @@
 // Windows initialization
 #include <GLFW/glfw3.h>
 // Engine
-#include "engine/model.h"
-#include "engine/player.h"
-#include "engine/shader.h"
+#include "engine/model/model.h"
+#include "engine/player/player.h"
+#include "engine/shader/shader.h"
 // GLM
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>

@@ -2,8 +2,8 @@
 #include "glm/fwd.hpp"
 #include "mesh.h"
 #include "position_struct.h"
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/gtx/quaternion.hpp"
 
 Node::Node(std::vector<double> rotation, std::vector<double> scale,
            std::vector<double> translation, Mesh &mesh)

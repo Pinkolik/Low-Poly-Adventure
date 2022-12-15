@@ -1,12 +1,12 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "../helpers/tiny_gltf.h"
+#include "../../helpers/tiny_gltf.h"
 #include "mesh.h"
 #include "node.h"
 #include "position_struct.h"
 #include "primitive.h"
-#include "shader.h"
+#include "../shader/shader.h"
 #include <vector>
 
 class Model {

@@ -1,8 +1,8 @@
 #include "primitive.h"
-#include "intersection/intersection_util.h"
+#include "../intersection/intersection_util.h"
 #include "texture.h"
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/vec3.hpp>
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/vec3.hpp"
 
 Primitive::Primitive(std::vector<Vertex> &vertices,
                      std::vector<unsigned short> &indices, Texture &texture)

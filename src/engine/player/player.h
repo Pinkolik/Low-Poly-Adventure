@@ -1,9 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "model.h"
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "../model/model.h"
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;

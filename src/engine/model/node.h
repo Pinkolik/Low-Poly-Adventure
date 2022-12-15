@@ -3,8 +3,8 @@
 
 #include "mesh.h"
 #include "position_struct.h"
-#include "shader.h"
-#include <glm/vec3.hpp>
+#include "../shader/shader.h"
+#include "glm/vec3.hpp"
 #include <vector>
 
 class Node {

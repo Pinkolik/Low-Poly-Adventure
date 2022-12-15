@@ -18,21 +18,21 @@ add_executable(Game
         src/helpers/stb_image_write.h
         src/helpers/json.hpp
         src/helpers/tiny_gltf.h
-        src/engine/shader.h
-        src/engine/shader.cpp
-        src/engine/mesh.h
-        src/engine/mesh.cpp
-        src/engine/map.cpp
-        src/engine/map.h
-        src/engine/model.cpp
-        src/engine/model.h
-        src/engine/node.h
-        src/engine/node.cpp
-        src/engine/primitive.h
-        src/engine/primitive.cpp
-        src/engine/position_struct.h
-        src/engine/player.h
-        src/engine/player.cpp
+        src/shader/shader.h
+        src/shader/shader.cpp
+        src/engine/model/mesh.h
+        src/engine/model/mesh.cpp
+        src/engine/map/map.cpp
+        src/engine/map/map.h
+        src/engine/model/model.cpp
+        src/engine/model/model.h
+        src/engine/model/node.h
+        src/engine/model/node.cpp
+        src/engine/model/primitive.h
+        src/engine/model/primitive.cpp
+        src/engine/model/position_struct.h
+        src/engine/player/player.h
+        src/engine/player/player.cpp
         src/engine/intersection/intersection_util.h
         src/engine/intersection/intersection_util.cpp
         src/engine/intersection/projection.h

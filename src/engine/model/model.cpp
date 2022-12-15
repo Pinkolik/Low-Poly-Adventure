@@ -9,7 +9,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "../helpers/tiny_gltf.h"
+#include "../../helpers/tiny_gltf.h"
 
 Model::Model(const char *path) { load(path); }
 

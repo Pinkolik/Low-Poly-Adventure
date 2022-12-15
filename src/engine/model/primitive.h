@@ -2,7 +2,7 @@
 #define PRIMITIVE_H
 
 #include "glm/fwd.hpp"
-#include "shader.h"
+#include "../shader/shader.h"
 #include "texture.h"
 #include "vertex.h"
 #include <vector>
