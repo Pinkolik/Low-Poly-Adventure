@@ -8,7 +8,7 @@
 GameInstance::GameInstance(const char *mapModelPath, const char *playerModelPath, const int width,
                            const int height) : width(width), height(height) {
     map = new Map(mapModelPath);
-    player = new Player(playerModelPath, map->getSpawnPos());
+    player = new Player(playerModelPath, map->getSpawnPos() + glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void GameInstance::draw() {
@@ -37,16 +37,18 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
 
     bool first = true;
     while (true) {
+        //first gravity
         glm::vec3 *mtv = map->getModel().getMinimumTranslationVec(player->getModel(), gravity);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
             player->applyForce(*mtv);
             delete mtv;
-            fallTime = 0.1f;
+            fallTime = 0.0f;
         } else if (first) {
             fallTime += deltaTime;
             first = false;
         }
+        //second movement
         mtv = map->getModel().getMinimumTranslationVec(player->getModel(), move);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;

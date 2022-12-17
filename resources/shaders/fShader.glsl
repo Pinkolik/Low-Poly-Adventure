@@ -9,11 +9,12 @@ uniform bool intersectionDetected;
 
 void main()
 {   if (!debug) {
-    if (!intersectionDetected) {
-        fragColor = texture(texture_diffuse1, texCoord);
-    } else {
-        fragColor = mix(texture(texture_diffuse1, texCoord), vec4(1.0, 0.0, 0.0, 1.0), 0.5f);
-    }
+//    if (!intersectionDetected) {
+//        fragColor = texture(texture_diffuse1, texCoord);
+//    } else {
+//        fragColor = mix(texture(texture_diffuse1, texCoord), vec4(1.0, 0.0, 0.0, 1.0), 0.5f);
+//    }
+    fragColor = texture(texture_diffuse1, texCoord);
 } else {
     fragColor = vec4(0, 1, 0.5, 0.2);
 }

@@ -49,7 +49,7 @@ GLFWwindow *createWindow() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow *window =
-            glfwCreateWindow(width, height, "Untitled Game", nullptr, nullptr);
+            glfwCreateWindow(width, height, "Low Poly Adventure", nullptr, nullptr);
     if (window == nullptr) {
         throw std::runtime_error("Failed to initialize window");
     }
@@ -73,7 +73,8 @@ void processInput(GLFWwindow *window) {
 }
 
 void mainLoop(GLFWwindow *window) {
-    gameInstance = new GameInstance("resources/models/mall/mall.gltf", "resources/models/player/player.gltf", width,
+    gameInstance = new GameInstance("resources/models/level_1/level_1.gltf", "resources/models/player/player.gltf",
+                                    width,
                                     height);
 
     // timing
