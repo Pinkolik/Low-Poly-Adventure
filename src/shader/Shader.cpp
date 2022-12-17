@@ -37,42 +37,42 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     ID = linkProgram(vertexShader, fragmentShader);
 }
 
-void Shader::use() { glUseProgram(ID); }
+void Shader::use() const { glUseProgram(ID); }
 
-void Shader::setBool(const std::string &name, bool value) {
+void Shader::setBool(const std::string &name, bool value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
 
-void Shader::setInt(const std::string &name, int value) {
+void Shader::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setFloat(const std::string &name, float value) {
+void Shader::setFloat(const std::string &name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setMatrix4f(const std::string &name, const glm::mat4 &value) {
+void Shader::setMatrix4f(const std::string &name, const glm::mat4 &value) const {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE,
                        glm::value_ptr(value));
 }
 
-void Shader::setVec3f(const std::string &name, const glm::vec3 &value) {
+void Shader::setVec3f(const std::string &name, const glm::vec3 &value) const {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y,
                 value.z);
 }
 
 unsigned int Shader::compileShader(GLenum type, std::string &shaderSourceStr) {
-    const char *shdaerSource = shaderSourceStr.c_str();
+    const char *shaderSource = shaderSourceStr.c_str();
     unsigned int shader;
     shader = glCreateShader(type);
-    glShaderSource(shader, 1, &shdaerSource, NULL);
+    glShaderSource(shader, 1, &shaderSource, nullptr);
     glCompileShader(shader);
 
     int success;
     char infoLog[512];
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
         throw std::runtime_error("Shader compilation failed. " +
                                  std::string(infoLog));
     }
@@ -90,7 +90,7 @@ unsigned int Shader::linkProgram(unsigned int vertexShader,
     char infoLog[512];
     glGetProgramiv(programID, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(programID, 512, NULL, infoLog);
+        glGetProgramInfoLog(programID, 512, nullptr, infoLog);
         throw std::runtime_error("Program linking failed. " + std::string(infoLog));
     }
     glDeleteShader(vertexShader);

@@ -23,7 +23,7 @@ public:
     void processResize(int newWidth, int newHeight);
 
 private:
-    const float GRAVITY = -0.05f;
+    const float GRAVITY = -0.3f;
 
     int width;
     int height;
@@ -31,7 +31,7 @@ private:
     Map *map;
     Player *player;
 
-    float fallTime = 0.1f;
+    float fallTime = 0.0f;
 
     Shader shader = Shader("resources/shaders/vShader.glsl",
                            "resources/shaders/fShader.glsl");

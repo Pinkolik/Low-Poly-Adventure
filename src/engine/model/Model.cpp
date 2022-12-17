@@ -36,12 +36,9 @@ glm::vec3 *Model::getMinimumTranslationVec(Model &other, glm::vec3 direction) {
                 for (const auto &mtv: mtvs) {
                     glm::vec3 normMtv = glm::normalize(*mtv);
                     float dot = glm::dot(normDir, normMtv);
-                    std::cout << "dot " << i++ << " = " << dot << std::endl;
                     if (dot < minDot) {
                         minDot = dot;
-                        if (res != nullptr) {
-                            delete res;
-                        }
+                        delete res;
                         res = mtv;
                     }
                 }
@@ -88,7 +85,7 @@ void Model::load(const char *path) {
     }
 
     tinygltf::Scene &scene = gltfModel.scenes[gltfModel.defaultScene];
-    for (int i : scene.nodes) {
+    for (int i: scene.nodes) {
         tinygltf::Node &gltfNode = gltfModel.nodes[i];
         Node node = processNode(gltfModel, gltfNode);
         nodes.push_back(node);
@@ -104,7 +101,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     Mesh mesh = processMesh(gltfModel, gltfMesh);
 
     Node node = Node(rotation, scale, translation, mesh);
-    for (int i : gltfNode.children) {
+    for (int i: gltfNode.children) {
         tinygltf::Node &gltfChildNode = gltfModel.nodes[i];
         Node childNode = processNode(gltfModel, gltfChildNode);
         node.addChild(childNode);
@@ -114,7 +111,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
 
 Mesh Model::processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
     std::vector<Primitive> primitives;
-    for (auto & gltfPrimitive : gltfMesh.primitives) {
+    for (auto &gltfPrimitive: gltfMesh.primitives) {
         std::vector<std::vector<float>> normals;
         std::vector<std::vector<float>> positions;
         std::vector<std::vector<float>> texcoord;
