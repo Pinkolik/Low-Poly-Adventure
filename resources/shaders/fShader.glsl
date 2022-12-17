@@ -3,19 +3,21 @@ out vec4 fragColor;
 
 in vec2 texCoord;
 
-uniform sampler2D texture_diffuse1;
+uniform sampler2D tex;
 uniform bool debug;
-uniform bool intersectionDetected;
 
-void main()
-{   if (!debug) {
-//    if (!intersectionDetected) {
-//        fragColor = texture(texture_diffuse1, texCoord);
-//    } else {
-//        fragColor = mix(texture(texture_diffuse1, texCoord), vec4(1.0, 0.0, 0.0, 1.0), 0.5f);
-//    }
-    fragColor = texture(texture_diffuse1, texCoord);
-} else {
-    fragColor = vec4(0, 1, 0.5, 0.2);
+vec4 limitColors(vec4 color) {
+    vec3 color3 = floor(color.xyz * 255 / 16) / 16;
+    return vec4(color3, color.w);
 }
+
+void main() {
+    if (!debug) {
+        vec4 color = texture(tex, texCoord);
+        fragColor = limitColors(color);
+        //        fragColor = texture(tex, texCoord);
+    } else {
+        fragColor = vec4(0, 1, 0.5, 0.2);
+    }
 }
+
