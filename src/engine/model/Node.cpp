@@ -41,7 +41,6 @@ void Node::buffer() {
 void Node::draw(Shader &shader, PositionStruct modelPos) {
     glm::mat4 modelMat = getModelMat(modelPos);
     shader.setMatrix4f("model", modelMat);
-    shader.setBool("intersectionDetected", intersectionDetected);
     for (Primitive &primitive: mesh.getPrimitives()) {
         primitive.draw(shader);
     }
@@ -49,7 +48,6 @@ void Node::draw(Shader &shader, PositionStruct modelPos) {
     for (Node &childNode: children) {
         childNode.draw(shader, modelPos);
     }
-    intersectionDetected = false;
 }
 
 void Node::addChild(Node &child) { children.push_back(child); }
@@ -78,7 +76,6 @@ std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos,
             std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(
                     modelMat, otherPrimitive, otherModelMat);
             if (!mtvs.empty()) {
-                intersectionDetected = true;
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
         }

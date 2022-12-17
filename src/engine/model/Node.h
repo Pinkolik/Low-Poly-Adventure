@@ -32,7 +32,6 @@ private:
 
     std::vector<Node> children;
     bool spawn = false;
-    bool intersectionDetected = false;
 
     glm::mat4 getModelMat(PositionStruct modelPos) const;
 };
