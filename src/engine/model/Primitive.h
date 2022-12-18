@@ -16,7 +16,7 @@ public:
 
     void draw(Shader &shader);
 
-    std::vector<glm::vec3 *> getMinimumTranslationVec(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(glm::mat4 &modelMat, Primitive &other, glm::mat4 &otherModelMat);
 
     Texture &getTexture();
 
@@ -26,7 +26,7 @@ public:
 
     void calculateAABB(glm::mat4 modelMat);
 
-    bool isAABBIntersecting(glm::vec3 translation, Primitive &other, glm::vec3 otherTranslation);
+    bool isAABBIntersecting(glm::vec3 &translation, Primitive &other, glm::vec3 &otherTranslation);
 
 private:
     unsigned int VAO = 0;
@@ -37,9 +37,9 @@ private:
     Texture texture;
     AABB *aabb = nullptr;
 
-    std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 modelMat);
+    std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 &modelMat);
 
-    glm::vec3 getTriangleNormal(int idx, glm::mat4 modelMat);
+    glm::vec3 getTriangleNormal(int idx, glm::mat4 &modelMat);
 };
 
 #endif

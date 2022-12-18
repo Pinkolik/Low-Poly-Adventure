@@ -23,8 +23,8 @@ public:
 
     glm::vec3 getTranslation() const;
 
-    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct modelPos, Node &other,
-                                                      PositionStruct otherModelPos);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                      PositionStruct &otherModelPos);
 
 private:
     Mesh mesh;
@@ -33,6 +33,7 @@ private:
     bool spawn = false;
 
     glm::mat4 getModelMat(PositionStruct modelPos) const;
+
     glm::mat4 getModelMatWithoutRotation(PositionStruct modelPos) const;
 };
 

@@ -46,9 +46,9 @@ void Primitive::draw(Shader &shader) {
 
 Texture &Primitive::getTexture() { return texture; }
 
-std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
-                                                             Primitive other,
-                                                             glm::mat4 otherModelMat) {
+std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 &modelMat,
+                                                             Primitive &other,
+                                                             glm::mat4 &otherModelMat) {
     std::vector<glm::vec3 *> res;
     for (int i = 0; i < indices.size(); i += 3) {
         std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, modelMat);
@@ -68,8 +68,7 @@ std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
     return res;
 }
 
-std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,
-                                                      glm::mat4 modelMat) {
+std::vector<glm::vec3> Primitive::getTriangleVertices(int idx, glm::mat4 &modelMat) {
     std::vector<glm::vec3> triangle;
     triangle.emplace_back(modelMat *
                           glm::vec4(vertices[indices[idx]].position, 1.0f));
@@ -80,7 +79,7 @@ std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,
     return triangle;
 }
 
-glm::vec3 Primitive::getTriangleNormal(int idx, glm::mat4 modelMat) {
+glm::vec3 Primitive::getTriangleNormal(int idx, glm::mat4 &modelMat) {
     return glm::normalize(glm::inverseTranspose(glm::mat3(modelMat)) * vertices[indices[idx]].normal);
 }
 
@@ -109,6 +108,6 @@ void Primitive::calculateAABB(glm::mat4 modelMat) {
     this->aabb = pAabb;
 }
 
-bool Primitive::isAABBIntersecting(glm::vec3 translation, Primitive &other, glm::vec3 otherTranslation) {
+bool Primitive::isAABBIntersecting(glm::vec3 &translation, Primitive &other, glm::vec3 &otherTranslation) {
     return aabb->isIntersecting(translation, other.aabb, otherTranslation);
 }

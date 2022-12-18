@@ -52,7 +52,11 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
             fallTime += deltaTime;
             first = false;
         }
+        for (auto &item: mtvs) {
+            delete item;
+        }
         //second movement
+        mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
         mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;

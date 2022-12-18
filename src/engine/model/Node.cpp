@@ -69,21 +69,21 @@ glm::mat4 Node::getModelMat(PositionStruct modelPos) const {
     return modelMat;
 }
 
-std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
-                                                        PositionStruct otherModelPos) {
+std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                        PositionStruct &otherModelPos) {
     std::vector<glm::vec3 *> res;
+    glm::mat4 modelMat = getModelMat(modelPos);
+    glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
     for (Primitive &primitive: mesh.getPrimitives()) {
         for (Primitive &otherPrimitive: other.mesh.getPrimitives()) {
-            bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive, otherModelPos.translation);
+            bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive,
+                                                                   otherModelPos.translation);
             if (isAabbIntersecting) {
                 std::cout << "AABB intersection detected" << std::endl;
             } else {
                 continue;
             }
-            glm::mat4 modelMat = getModelMat(modelPos);
-            glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
-            std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(
-                    modelMat, otherPrimitive, otherModelMat);
+            std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(modelMat, otherPrimitive, otherModelMat);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
