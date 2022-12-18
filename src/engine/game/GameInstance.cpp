@@ -31,8 +31,8 @@ void GameInstance::draw() {
 void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     std::string title = "Low Poly Adventure FPS: " + std::to_string(1.0f / deltaTime);
     glfwSetWindowTitle(window, title.c_str());
-//    glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
-    glm::vec3 gravity = glm::vec3(0, 0, 0);
+    glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
+//    glm::vec3 gravity = glm::vec3(0, 0, 0);
     std::cout << "Fall time: " << fallTime << std::endl;
     glm::vec3 move = player->processKeyboard(window, deltaTime);
     player->applyForce(gravity);
@@ -41,7 +41,7 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     bool first = true;
     while (true) {
         //first gravity
-        glm::vec3 *mtv = map->getModel().getMinimumTranslationVec(player->getModel(), gravity);
+        glm::vec3 *mtv = map->getModel().getMinimumTranslationVec(player->getModel());
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
             player->applyForce(*mtv);
@@ -52,7 +52,7 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
             first = false;
         }
         //second movement
-        mtv = map->getModel().getMinimumTranslationVec(player->getModel(), move);
+        mtv = map->getModel().getMinimumTranslationVec(player->getModel());
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
             player->applyForce(*mtv);

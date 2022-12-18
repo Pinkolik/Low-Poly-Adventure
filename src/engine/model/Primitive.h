@@ -5,6 +5,7 @@
 #include "../../shader/Shader.h"
 #include "Texture.h"
 #include "Vertex.h"
+#include "../intersection/AABB.h"
 #include <vector>
 
 class Primitive {
@@ -23,6 +24,10 @@ public:
 
     glm::vec3 getMax(glm::mat4 modelMat);
 
+    void calculateAABB(glm::mat4 modelMat);
+
+    bool isAABBIntersecting(glm::vec3 translation, Primitive &other, glm::vec3 otherTranslation);
+
 private:
     unsigned int VAO = 0;
     unsigned int VBO = 0;
@@ -30,6 +35,7 @@ private:
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
     Texture texture;
+    AABB *aabb = nullptr;
 
     std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 modelMat);
 

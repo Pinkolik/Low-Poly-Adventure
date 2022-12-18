@@ -101,3 +101,14 @@ glm::vec3 Primitive::getMax(glm::mat4 modelMat) {
     }
     return max;
 }
+
+void Primitive::calculateAABB(glm::mat4 modelMat) {
+    glm::vec3 min = getMin(modelMat);
+    glm::vec3 max = getMax(modelMat);
+    AABB *pAabb = new AABB(min, max);
+    this->aabb = pAabb;
+}
+
+bool Primitive::isAABBIntersecting(glm::vec3 translation, Primitive &other, glm::vec3 otherTranslation) {
+    return aabb->isIntersecting(translation, other.aabb, otherTranslation);
+}

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Node.h"
 #include "Mesh.h"
 #include "PositionStruct.h"
@@ -21,14 +22,13 @@ Node::Node(std::vector<double> rotation, std::vector<double> scale,
                 glm::vec3(translation[0], translation[1], translation[2]);
     }
 
-    for (auto &primitive: mesh.getPrimitives()) {
+    glm::mat4 modelMat = getModelMat(PositionStruct());
+    for (auto &primitive: this->mesh.getPrimitives()) {
         if (primitive.getTexture().name == "spawn") {
             spawn = true;
-            break;
         }
+        primitive.calculateAABB(modelMat);
     }
-
-    aabb = calculateAABB();
 }
 
 void Node::buffer() {
@@ -72,10 +72,16 @@ glm::mat4 Node::getModelMat(PositionStruct modelPos) const {
 std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos, Node &other,
                                                         PositionStruct otherModelPos) {
     std::vector<glm::vec3 *> res;
-    glm::mat4 modelMat = getModelMat(modelPos);
-    glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
     for (Primitive &primitive: mesh.getPrimitives()) {
         for (Primitive &otherPrimitive: other.mesh.getPrimitives()) {
+            bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive, otherModelPos.translation);
+            if (isAabbIntersecting) {
+                std::cout << "AABB intersection detected" << std::endl;
+            } else {
+                continue;
+            }
+            glm::mat4 modelMat = getModelMat(modelPos);
+            glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
             std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(
                     modelMat, otherPrimitive, otherModelMat);
             if (!mtvs.empty()) {
@@ -92,26 +98,6 @@ std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos,
         }
     }
     return res;
-}
-
-AABB *Node::calculateAABB() {
-    glm::mat4 modelMat = getModelMat(PositionStruct());
-    glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
-    glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
-    for (auto &primitive: mesh.getPrimitives()) {
-        glm::vec3 primMin = primitive.getMin(modelMat);
-        glm::vec3 primMax = primitive.getMax(modelMat);
-        min = IntersectionUtil::updateIfLess(min, primMin);
-        max = IntersectionUtil::updateIfGreater(max, primMax);
-    }
-    return new AABB(min, max);
-}
-
-bool Node::isAABBIntersecting(PositionStruct modelPos, Node &other, PositionStruct otherModelPos) {
-    std::vector<glm::vec3 *> res;
-    glm::mat4 modelMat = getModelMatWithoutRotation(modelPos);
-    glm::mat4 otherModelMat = other.getModelMatWithoutRotation(otherModelPos);
-    return aabb->isIntersecting(modelMat, other.aabb, otherModelMat);
 }
 
 glm::mat4 Node::getModelMatWithoutRotation(PositionStruct modelPos) const {

@@ -88,11 +88,11 @@ void AABB::fillVertices() {
 
 }
 
-bool AABB::isIntersecting(glm::mat4 modelMat, AABB *other, glm::mat4 otherModelMat) {
-    glm::vec3 firstMin = modelMat * glm::vec4(min, 1.0f);
-    glm::vec3 firstMax = modelMat * glm::vec4(max, 1.0f);
-    glm::vec3 secondMin = otherModelMat * glm::vec4(other->min, 1.0f);
-    glm::vec3 secondMax = otherModelMat * glm::vec4(other->max, 1.0f);
+bool AABB::isIntersecting(glm::vec3 translation, AABB *other, glm::vec3 otherTranslation) {
+    glm::vec3 firstMin = translation + min;
+    glm::vec3 firstMax = translation + max;
+    glm::vec3 secondMin = otherTranslation + other->min;
+    glm::vec3 secondMax = otherTranslation + other->max;
     return firstMin.x <= secondMax.x && firstMax.x >= secondMin.x &&
            firstMin.y <= secondMax.y && firstMax.y >= secondMin.y &&
            firstMin.z <= secondMax.z && firstMax.z >= secondMin.z;

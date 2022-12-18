@@ -18,7 +18,7 @@ public:
 
     void draw(Shader &shader);
 
-    bool isIntersecting(glm::mat4 modelMat, AABB *other, glm::mat4 otherModelMat);
+    bool isIntersecting(glm::vec3 translation, AABB *other, glm::vec3 otherTranslation);
 
 private:
     unsigned int VAO;
