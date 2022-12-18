@@ -71,3 +71,21 @@ glm::vec3 IntersectionUtil::updateIfGreater(glm::vec3 &first, glm::vec3 &second)
     }
     return res;
 }
+
+glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<glm::vec3 *> mtvs, glm::vec3 direction) {
+    glm::vec3 *res = nullptr;
+    float minDot = INFINITY;
+    if (!mtvs.empty()) {
+        glm::vec3 normDir = glm::normalize(direction);
+        for (const auto &mtv: mtvs) {
+            glm::vec3 normMtv = glm::normalize(*mtv);
+            float dot = glm::dot(normDir, normMtv);
+            if (dot < minDot) {
+                minDot = dot;
+                res = mtv;
+            }
+        }
+
+    }
+    return res;
+}

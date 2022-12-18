@@ -3,6 +3,7 @@
 //
 
 #include "GameInstance.h"
+#include "../intersection/IntersectionUtil.h"
 #include <iostream>
 
 GameInstance::GameInstance(const char *mapModelPath, const char *playerModelPath, const int width,
@@ -29,7 +30,7 @@ void GameInstance::draw() {
 }
 
 void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
-    std::string title = "Low Poly Adventure FPS: " + std::to_string(1.0f / deltaTime);
+    std::string title = "Low Poly Adventure FPS: " + std::to_string((int) floor(1.0f / deltaTime));
     glfwSetWindowTitle(window, title.c_str());
     glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
 //    glm::vec3 gravity = glm::vec3(0, 0, 0);
@@ -41,24 +42,26 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     bool first = true;
     while (true) {
         //first gravity
-        glm::vec3 *mtv = map->getModel().getMinimumTranslationVec(player->getModel());
+        std::vector<glm::vec3 *> mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
+        glm::vec3 *mtv = IntersectionUtil::getMostOppositeVec(mtvs, gravity);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
             player->applyForce(*mtv);
-            delete mtv;
             fallTime = 0.0f;
         } else if (first) {
             fallTime += deltaTime;
             first = false;
         }
         //second movement
-        mtv = map->getModel().getMinimumTranslationVec(player->getModel());
+        mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
             player->applyForce(*mtv);
-            delete mtv;
         } else {
             break;
+        }
+        for (auto &item: mtvs) {
+            delete item;
         }
     }
 }

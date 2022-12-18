@@ -16,6 +16,8 @@ public:
 
     static glm::vec3 updateIfGreater(glm::vec3 &first, glm::vec3 &second);
 
+    static glm::vec3 *getMostOppositeVec(std::vector<glm::vec3 *> mtvs, glm::vec3 direction);
+
 private:
     static std::vector<glm::vec3>
     getSeparatingAxes(std::vector<glm::vec3> &triangle,
