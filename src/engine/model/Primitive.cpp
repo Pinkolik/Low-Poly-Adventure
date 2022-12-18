@@ -24,19 +24,15 @@ void Primitive::buffer() {
     glBindBuffer(GL_ARRAY_BUFFER, newVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newEBO);
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
-                 vertices.data(), GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short),
-                 indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *) offsetof(Vertex, normal));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, normal));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *) offsetof(Vertex, texCoord));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, texCoord));
 
     glBindVertexArray(0);
 }
@@ -56,13 +52,10 @@ std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 modelMat,
     std::vector<glm::vec3 *> res;
     for (int i = 0; i < indices.size(); i += 3) {
         std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, modelMat);
-        glm::vec3 firstTriangleNormal =
-                getTriangleNormal(i, modelMat);
+        glm::vec3 firstTriangleNormal = getTriangleNormal(i, modelMat);
         for (int j = 0; j < other.indices.size(); j += 3) {
-            std::vector<glm::vec3> secondTriangle =
-                    other.getTriangleVertices(j, otherModelMat);
-            glm::vec3 secondTriangleNormal =
-                    other.getTriangleNormal(j, otherModelMat);
+            std::vector<glm::vec3> secondTriangle = other.getTriangleVertices(j, otherModelMat);
+            glm::vec3 secondTriangleNormal = other.getTriangleNormal(j, otherModelMat);
             glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(
                     firstTriangle, firstTriangleNormal, secondTriangle,
                     secondTriangleNormal);
@@ -87,8 +80,28 @@ std::vector<glm::vec3> Primitive::getTriangleVertices(int idx,
     return triangle;
 }
 
-glm::vec3 Primitive::getTriangleNormal(int idx,
-                                       glm::mat4 modelMat) {
-    return glm::normalize(glm::inverseTranspose(glm::mat3(modelMat)) *
-                          vertices[indices[idx]].normal);
+glm::vec3 Primitive::getTriangleNormal(int idx, glm::mat4 modelMat) {
+    return glm::normalize(glm::inverseTranspose(glm::mat3(modelMat)) * vertices[indices[idx]].normal);
+}
+
+glm::vec3 Primitive::getMin(glm::mat4 modelMat) {
+    glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
+    for (auto &vertex: vertices) {
+        glm::vec3 pos = modelMat * glm::vec4(vertex.position, 1.0f);
+        if (IntersectionUtil::isLess(pos, min)) {
+            min = pos;
+        }
+    }
+    return min;
+}
+
+glm::vec3 Primitive::getMax(glm::mat4 modelMat) {
+    glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+    for (auto &vertex: vertices) {
+        glm::vec3 pos = modelMat * glm::vec4(vertex.position, 1.0f);
+        if (IntersectionUtil::isGreater(pos, max)) {
+            max = pos;
+        }
+    }
+    return max;
 }

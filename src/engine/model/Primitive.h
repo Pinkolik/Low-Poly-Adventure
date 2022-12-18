@@ -9,17 +9,19 @@
 
 class Primitive {
 public:
-    Primitive(std::vector<Vertex> &vertices, std::vector<unsigned short> &indices,
-              Texture &texture);
+    Primitive(std::vector<Vertex> &vertices, std::vector<unsigned short> &indices, Texture &texture);
 
     void buffer();
 
     void draw(Shader &shader);
 
-    std::vector<glm::vec3 *> getMinimumTranslationVec(glm::mat4 modelMat, Primitive other,
-                                                      glm::mat4 otherModelMat);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(glm::mat4 modelMat, Primitive other, glm::mat4 otherModelMat);
 
     Texture &getTexture();
+
+    glm::vec3 getMin(glm::mat4 modelMat);
+
+    glm::vec3 getMax(glm::mat4 modelMat);
 
 private:
     unsigned int VAO = 0;

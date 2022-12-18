@@ -3,6 +3,7 @@
 #include "PositionStruct.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "../intersection/IntersectionUtil.h"
 
 Node::Node(std::vector<double> rotation, std::vector<double> scale,
            std::vector<double> translation, Mesh &mesh)
@@ -26,6 +27,8 @@ Node::Node(std::vector<double> rotation, std::vector<double> scale,
             break;
         }
     }
+
+    aabb = calculateAABB();
 }
 
 void Node::buffer() {
@@ -89,4 +92,21 @@ std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct modelPos,
         }
     }
     return res;
+}
+
+AABB *Node::calculateAABB() {
+    glm::mat4 modelMat = getModelMat(PositionStruct());
+    glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
+    glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+    for (auto &primitive: mesh.getPrimitives()) {
+        glm::vec3 primMin = primitive.getMin(modelMat);
+        glm::vec3 primMax = primitive.getMax(modelMat);
+        if (IntersectionUtil::isLess(primMin, min)) {
+            min = primMin;
+        }
+        if (IntersectionUtil::isGreater(primMax, max)) {
+            max = primMax;
+        }
+    }
+    return new AABB(min, max);
 }

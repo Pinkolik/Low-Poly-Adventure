@@ -43,3 +43,11 @@ std::vector<glm::vec3> IntersectionUtil::getSeparatingAxes(std::vector<glm::vec3
     res.push_back(glm::normalize(glm::cross(normal, ca)));
     return res;
 }
+
+bool IntersectionUtil::isLess(glm::vec3 &first, glm::vec3 &second) {
+    return first.x < second.x || first.y < second.y || first.z < second.z;
+}
+
+bool IntersectionUtil::isGreater(glm::vec3 &first, glm::vec3 &second) {
+    return first.x > second.x || first.y > second.y || first.z > second.z;
+}

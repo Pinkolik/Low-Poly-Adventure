@@ -5,6 +5,7 @@
 #include "PositionStruct.h"
 #include "../../shader/Shader.h"
 #include "glm/vec3.hpp"
+#include "../intersection/AABB.h"
 #include <vector>
 
 class Node {
@@ -25,13 +26,14 @@ public:
     std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct modelPos, Node &other,
                                                       PositionStruct otherModelPos);
 
+    AABB *calculateAABB();
+
 private:
     Mesh mesh;
-
     PositionStruct position;
-
     std::vector<Node> children;
     bool spawn = false;
+    AABB *aabb;
 
     glm::mat4 getModelMat(PositionStruct modelPos) const;
 };

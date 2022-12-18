@@ -37,7 +37,7 @@ add_executable(Game
         src/engine/intersection/IntersectionUtil.cpp
         src/engine/intersection/Projection.h
         src/engine/intersection/Projection.cpp
-        src/engine/game/GameInstance.cpp src/engine/game/GameInstance.h)
+        src/engine/game/GameInstance.cpp src/engine/game/GameInstance.h src/engine/intersection/AABB.cpp src/engine/intersection/AABB.h)
 add_custom_command(
         TARGET Game POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
