@@ -88,9 +88,7 @@ glm::vec3 Primitive::getMin(glm::mat4 modelMat) {
     glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
     for (auto &vertex: vertices) {
         glm::vec3 pos = modelMat * glm::vec4(vertex.position, 1.0f);
-        if (IntersectionUtil::isLess(pos, min)) {
-            min = pos;
-        }
+        min = IntersectionUtil::updateIfLess(min, pos);
     }
     return min;
 }
@@ -99,9 +97,7 @@ glm::vec3 Primitive::getMax(glm::mat4 modelMat) {
     glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
     for (auto &vertex: vertices) {
         glm::vec3 pos = modelMat * glm::vec4(vertex.position, 1.0f);
-        if (IntersectionUtil::isGreater(pos, max)) {
-            max = pos;
-        }
+        max = IntersectionUtil::updateIfGreater(max, pos);
     }
     return max;
 }

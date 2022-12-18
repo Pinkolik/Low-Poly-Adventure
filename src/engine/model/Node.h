@@ -28,6 +28,8 @@ public:
 
     AABB *calculateAABB();
 
+    bool isAABBIntersecting(PositionStruct modelPos, Node &other, PositionStruct otherModelPos);
+
 private:
     Mesh mesh;
     PositionStruct position;
@@ -36,6 +38,7 @@ private:
     AABB *aabb;
 
     glm::mat4 getModelMat(PositionStruct modelPos) const;
+    glm::mat4 getModelMatWithoutRotation(PositionStruct modelPos) const;
 };
 
 #endif

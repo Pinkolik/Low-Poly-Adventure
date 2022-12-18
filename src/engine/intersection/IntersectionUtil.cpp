@@ -44,10 +44,30 @@ std::vector<glm::vec3> IntersectionUtil::getSeparatingAxes(std::vector<glm::vec3
     return res;
 }
 
-bool IntersectionUtil::isLess(glm::vec3 &first, glm::vec3 &second) {
-    return first.x < second.x || first.y < second.y || first.z < second.z;
+glm::vec3 IntersectionUtil::updateIfLess(glm::vec3 &first, glm::vec3 &second) {
+    glm::vec3 res = first;
+    if (second.x < first.x) {
+        res.x = second.x;
+    }
+    if (second.y < first.y) {
+        res.y = second.y;
+    }
+    if (second.z < first.z) {
+        res.z = second.z;
+    }
+    return res;
 }
 
-bool IntersectionUtil::isGreater(glm::vec3 &first, glm::vec3 &second) {
-    return first.x > second.x || first.y > second.y || first.z > second.z;
+glm::vec3 IntersectionUtil::updateIfGreater(glm::vec3 &first, glm::vec3 &second) {
+    glm::vec3 res = first;
+    if (second.x > first.x) {
+        res.x = second.x;
+    }
+    if (second.y > first.y) {
+        res.y = second.y;
+    }
+    if (second.z > first.z) {
+        res.z = second.z;
+    }
+    return res;
 }

@@ -12,9 +12,9 @@ public:
                              std::vector<glm::vec3> &secondTriangle,
                              glm::vec3 &secondTriangleNormal);
 
-    static bool isLess(glm::vec3 &first, glm::vec3 &second);
+    static glm::vec3 updateIfLess(glm::vec3 &first, glm::vec3 &second);
 
-    static bool isGreater(glm::vec3 &first, glm::vec3 &second);
+    static glm::vec3 updateIfGreater(glm::vec3 &first, glm::vec3 &second);
 
 private:
     static std::vector<glm::vec3>

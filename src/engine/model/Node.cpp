@@ -101,12 +101,22 @@ AABB *Node::calculateAABB() {
     for (auto &primitive: mesh.getPrimitives()) {
         glm::vec3 primMin = primitive.getMin(modelMat);
         glm::vec3 primMax = primitive.getMax(modelMat);
-        if (IntersectionUtil::isLess(primMin, min)) {
-            min = primMin;
-        }
-        if (IntersectionUtil::isGreater(primMax, max)) {
-            max = primMax;
-        }
+        min = IntersectionUtil::updateIfLess(min, primMin);
+        max = IntersectionUtil::updateIfGreater(max, primMax);
     }
     return new AABB(min, max);
+}
+
+bool Node::isAABBIntersecting(PositionStruct modelPos, Node &other, PositionStruct otherModelPos) {
+    std::vector<glm::vec3 *> res;
+    glm::mat4 modelMat = getModelMatWithoutRotation(modelPos);
+    glm::mat4 otherModelMat = other.getModelMatWithoutRotation(otherModelPos);
+    return aabb->isIntersecting(modelMat, other.aabb, otherModelMat);
+}
+
+glm::mat4 Node::getModelMatWithoutRotation(PositionStruct modelPos) const {
+    glm::mat4 translationMat = glm::translate(glm::mat4(1), modelPos.translation);
+    glm::mat4 scaleMat = glm::scale(glm::mat4(1), modelPos.scale);
+    glm::mat4 modelMat = translationMat * scaleMat;
+    return modelMat;
 }

@@ -5,5 +5,95 @@
 #include "AABB.h"
 
 AABB::AABB(glm::vec3 min, glm::vec3 max) : min(min), max(max) {
+    fillVertices();
+    buffer();
+}
 
+void AABB::draw(Shader &shader) {
+    shader.setMatrix4f("model", glm::mat4(1));
+    shader.setBool("debug", true);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    shader.setBool("debug", false);
+}
+
+void AABB::buffer() {
+    glGenVertexArrays(1, &VAO);
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
+
+    glBindVertexArray(0);
+}
+
+void AABB::fillVertices() {
+    glm::vec3 diag = max - min;
+    glm::vec3 x = glm::vec3(diag.x, 0, 0);
+    glm::vec3 y = glm::vec3(0, diag.y, 0);
+    glm::vec3 z = glm::vec3(0, 0, diag.z);
+
+    //min
+    vertices.push_back(min);
+    vertices.push_back(min + x);
+    vertices.push_back(min + y);
+    vertices.push_back(min);
+    vertices.push_back(min + y);
+    vertices.push_back(min + z);
+    vertices.push_back(min);
+    vertices.push_back(min + z);
+    vertices.push_back(min + x);
+
+    vertices.push_back(min + y);
+    vertices.push_back(min + y + x);
+    vertices.push_back(min + x);
+
+    vertices.push_back(min + y);
+    vertices.push_back(min + y + z);
+    vertices.push_back(min + z);
+
+    vertices.push_back(min + y);
+    vertices.push_back(min + y + z);
+    vertices.push_back(min + y + x);
+
+    //max
+    vertices.push_back(max);
+    vertices.push_back(max - x);
+    vertices.push_back(max - y);
+    vertices.push_back(max);
+    vertices.push_back(max - y);
+    vertices.push_back(max - z);
+    vertices.push_back(max);
+    vertices.push_back(max - z);
+    vertices.push_back(max - x);
+
+    vertices.push_back(max - y);
+    vertices.push_back(max - y - x);
+    vertices.push_back(max - x);
+
+    vertices.push_back(max - y);
+    vertices.push_back(max - y - z);
+    vertices.push_back(max - z);
+
+    vertices.push_back(max - y);
+    vertices.push_back(max - y - z);
+    vertices.push_back(max - y - x);
+
+}
+
+bool AABB::isIntersecting(glm::mat4 modelMat, AABB *other, glm::mat4 otherModelMat) {
+    glm::vec3 firstMin = modelMat * glm::vec4(min, 1.0f);
+    glm::vec3 firstMax = modelMat * glm::vec4(max, 1.0f);
+    glm::vec3 secondMin = otherModelMat * glm::vec4(other->min, 1.0f);
+    glm::vec3 secondMax = otherModelMat * glm::vec4(other->max, 1.0f);
+    return firstMin.x <= secondMax.x && firstMax.x >= secondMin.x &&
+           firstMin.y <= secondMax.y && firstMax.y >= secondMin.y &&
+           firstMin.z <= secondMax.z && firstMax.z >= secondMin.z;
 }
