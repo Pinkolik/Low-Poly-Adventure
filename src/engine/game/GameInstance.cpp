@@ -30,8 +30,6 @@ void GameInstance::draw() {
 }
 
 void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
-    std::string title = "Low Poly Adventure FPS: " + std::to_string((int) floor(1.0f / deltaTime));
-    glfwSetWindowTitle(window, title.c_str());
     glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
 //    glm::vec3 gravity = glm::vec3(0, 0, 0);
 //    std::cout << "Fall time: " << fallTime << std::endl;
