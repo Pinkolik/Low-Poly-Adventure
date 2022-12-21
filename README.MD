@@ -48,7 +48,7 @@ Overall, the game is designed to be a nostalgic and fun experience for players w
 - Blender (for making models for this game)
 
 ## Screenshots:
-[![https://imgur.com/1xrsmWb.png](https://imgur.com/1xrsmWb.png)](https://imgur.com/1xrsmWb.png)
+[![https://i.imgur.com/CfcCUeU.png](https://i.imgur.com/CfcCUeU.png)](https://i.imgur.com/CfcCUeU.png)
 
 ## Contact:
 For help or support with the game, please contact me at mrpinkolik@gmail.com
