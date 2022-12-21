@@ -46,21 +46,21 @@ void Primitive::draw(Shader &shader) {
 
 Texture &Primitive::getTexture() { return texture; }
 
-std::vector<glm::vec3 *> Primitive::getMinimumTranslationVec(glm::mat4 &modelMat,
-                                                             Primitive &other,
-                                                             glm::mat4 &otherModelMat) {
-    std::vector<glm::vec3 *> res;
+std::vector<IntersectionResult *> Primitive::getMinimumTranslationVec(glm::mat4 &modelMat,
+                                                                      Primitive &other,
+                                                                      glm::mat4 &otherModelMat) {
+    std::vector<IntersectionResult *> res;
     for (int i = 0; i < indices.size(); i += 3) {
         std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, modelMat);
         glm::vec3 firstTriangleNormal = getTriangleNormal(i, modelMat);
         for (int j = 0; j < other.indices.size(); j += 3) {
             std::vector<glm::vec3> secondTriangle = other.getTriangleVertices(j, otherModelMat);
             glm::vec3 secondTriangleNormal = other.getTriangleNormal(j, otherModelMat);
-            glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(
+            IntersectionResult *pIntersectionResult = IntersectionUtil::getMinimumTranslationVec(
                     firstTriangle, firstTriangleNormal, secondTriangle,
                     secondTriangleNormal);
-            if (mtv != nullptr) {
-                res.push_back(mtv);
+            if (pIntersectionResult != nullptr) {
+                res.push_back(pIntersectionResult);
                 break;
             }
         }

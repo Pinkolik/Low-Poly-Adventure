@@ -23,14 +23,14 @@ glm::vec3 Model::getSpawnPos() {
     return glm::vec3(0);
 }
 
-std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) {
-    std::vector<glm::vec3 *> res;
+std::vector<IntersectionResult *> Model::getMinimumTranslationVec(Model &other) {
+    std::vector<IntersectionResult *> res;
     for (auto &node: nodes) {
         for (auto &otherNode: other.nodes) {
-            std::vector<glm::vec3 *> mtvs =
+            std::vector<IntersectionResult *> intersections =
                     node.getMinimumTranslationVec(position, otherNode, other.position);
-            if (!mtvs.empty()) {
-                res.insert(res.end(), mtvs.begin(), mtvs.end());
+            if (!intersections.empty()) {
+                res.insert(res.end(), intersections.begin(), intersections.end());
             }
         }
     }

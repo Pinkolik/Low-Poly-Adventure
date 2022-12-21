@@ -23,8 +23,8 @@ public:
 
     glm::vec3 getTranslation() const;
 
-    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
-                                                      PositionStruct &otherModelPos);
+    std::vector<IntersectionResult *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                               PositionStruct &otherModelPos);
 
 private:
     Mesh mesh;

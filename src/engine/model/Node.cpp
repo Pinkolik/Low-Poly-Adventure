@@ -69,32 +69,32 @@ glm::mat4 Node::getModelMat(PositionStruct modelPos) const {
     return modelMat;
 }
 
-std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
-                                                        PositionStruct &otherModelPos) {
-    std::vector<glm::vec3 *> res;
+std::vector<IntersectionResult *> Node::getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                                 PositionStruct &otherModelPos) {
+    std::vector<IntersectionResult *> res;
     glm::mat4 modelMat = getModelMat(modelPos);
     glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
     for (Primitive &primitive: mesh.getPrimitives()) {
         for (Primitive &otherPrimitive: other.mesh.getPrimitives()) {
             bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive,
                                                                    otherModelPos.translation);
-            if (isAabbIntersecting) {
-                std::cout << "AABB intersection detected" << std::endl;
-            } else {
+            if (!isAabbIntersecting) {
                 continue;
             }
-            std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(modelMat, otherPrimitive, otherModelMat);
-            if (!mtvs.empty()) {
-                res.insert(res.end(), mtvs.begin(), mtvs.end());
+            std::vector<IntersectionResult *> intersections = primitive.getMinimumTranslationVec(modelMat,
+                                                                                                 otherPrimitive,
+                                                                                                 otherModelMat);
+            if (!intersections.empty()) {
+                res.insert(res.end(), intersections.begin(), intersections.end());
             }
         }
     }
 
     for (Node &childNode: children) {
-        std::vector<glm::vec3 *> mtvs =
+        std::vector<IntersectionResult *> intersections =
                 childNode.getMinimumTranslationVec(modelPos, other, otherModelPos);
-        if (!mtvs.empty()) {
-            res.insert(res.end(), mtvs.begin(), mtvs.end());
+        if (!intersections.empty()) {
+            res.insert(res.end(), intersections.begin(), intersections.end());
         }
     }
     return res;
