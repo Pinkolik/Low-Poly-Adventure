@@ -31,6 +31,19 @@ glm::vec3 Player::processKeyboard(GLFWwindow *window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         res += right * velocity * glm::vec3(1.0f, 0.0f, 1.0f);
     }
+
+//    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+//        res += front * velocity * glm::vec3(1.0f, 1.0f, 1.0f);
+//    }
+//    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+//        res -= front * velocity * glm::vec3(1.0f, 1.0f, 1.0f);
+//    }
+//    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+//        res -= right * velocity * glm::vec3(1.0f, 1.0f, 1.0f);
+//    }
+//    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+//        res += right * velocity * glm::vec3(1.0f, 1.0f, 1.0f);
+//    }
     return res;
 }
 
@@ -64,7 +77,7 @@ void Player::updatePlayerVectors() {
 
 Model &Player::getModel() {
     model.setTranslation(position);
-    model.setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
+    //model.setRotation(glm::quat(glm::vec3(0, glm::radians(-yaw), 0)));
     return model;
 }
 

@@ -3,6 +3,7 @@
 //
 
 #include "GameInstance.h"
+#include "../intersection/IntersectionUtil.h"
 #include <iostream>
 
 GameInstance::GameInstance(const char *mapModelPath, const char *playerModelPath, const int width,
@@ -30,7 +31,8 @@ void GameInstance::draw() {
 
 void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
-    std::cout << "Fall time: " << fallTime << std::endl;
+//    glm::vec3 gravity = glm::vec3(0, 0, 0);
+//    std::cout << "Fall time: " << fallTime << std::endl;
     glm::vec3 move = player->processKeyboard(window, deltaTime);
     player->applyForce(gravity);
     player->applyForce(move);
@@ -38,24 +40,28 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     bool first = true;
     while (true) {
         //first gravity
-        glm::vec3 *mtv = map->getModel().getMinimumTranslationVec(player->getModel(), gravity);
+        std::vector<IntersectionResult *> intersections = map->getModel().getMinimumTranslationVec(player->getModel());
+        glm::vec3 *mtv = IntersectionUtil::getMostOppositeVec(intersections, gravity);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
-            player->applyForce(*mtv);
-            delete mtv;
+            glm::vec3 force = *mtv;
+            player->applyForce(force);
             fallTime = 0.0f;
         } else if (first) {
             fallTime += deltaTime;
             first = false;
         }
+        intersections = IntersectionUtil::recalculateIntersections(intersections, mtv);
         //second movement
-        mtv = map->getModel().getMinimumTranslationVec(player->getModel(), move);
+        mtv = IntersectionUtil::getMostOppositeVec(intersections, move);
         if (mtv != nullptr) {
             std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
             player->applyForce(*mtv);
-            delete mtv;
         } else {
             break;
+        }
+        for (auto &item: intersections) {
+            delete item;
         }
     }
 }
