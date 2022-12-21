@@ -15,7 +15,7 @@ IntersectionUtil::getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle
     separatingAxes.push_back(secondTriangleNormal);
     separatingAxes.insert(separatingAxes.end(), firstAxes.begin(), firstAxes.end());
     separatingAxes.insert(separatingAxes.end(), secondAxes.begin(), secondAxes.end());
-    float trans;
+    float trans = INFINITY;
     glm::vec3 mtvAxis;
     for (auto &axis: separatingAxes) {
         Projection firstProj = Projection(axis, firstTriangle);
@@ -24,10 +24,14 @@ IntersectionUtil::getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle
             return nullptr;
         }
         float intersectionLen = firstProj.findIntersectionLength(secondProj);
-        if (axis == firstTriangleNormal) {
-            mtvAxis = axis;
+        if (intersectionLen < trans) {
             trans = intersectionLen;
+            mtvAxis = axis;
         }
+//        if (axis == firstTriangleNormal) {
+//            mtvAxis = axis;
+//            trans = intersectionLen;
+//        }
     }
     glm::vec3 mtv = glm::vec3(mtvAxis * trans * 1.5f);
     return new IntersectionResult{firstTriangle, firstTriangleNormal, secondTriangle, secondTriangleNormal, mtv};
@@ -77,17 +81,23 @@ glm::vec3 IntersectionUtil::updateIfGreater(glm::vec3 &first, glm::vec3 &second)
 glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<IntersectionResult *> &intersections, glm::vec3 direction) {
     glm::vec3 *res = nullptr;
     float minDot = INFINITY;
+    glm::vec3 minNormMtv;
     if (!intersections.empty()) {
         glm::vec3 normDir = glm::normalize(direction);
+        std::cout << "Norm Dir: " << normDir.x << ", " << normDir.y << ", " << normDir.z << std::endl;
         for (auto &intersection: intersections) {
             glm::vec3 normMtv = glm::normalize(intersection->mtv);
             float dot = glm::dot(normDir, normMtv);
             if (dot < minDot) {
                 minDot = dot;
                 res = &(intersection->mtv);
+                minNormMtv = normMtv;
             }
         }
 
+    }
+    if (res != nullptr) {
+        std::cout << "Min Norm MTV: " << minNormMtv.x << ", " << minNormMtv.y << ", " << minNormMtv.z << std::endl;
     }
     return res;
 }
@@ -100,10 +110,10 @@ IntersectionUtil::recalculateIntersections(std::vector<IntersectionResult *> &in
     }
     std::vector<IntersectionResult *> result;
     for (auto &intersection: intersections) {
-        if (&(intersection->mtv) != translationForSecond) {
-            delete intersection;
-            continue;
-        }
+//        if (&(intersection->mtv) != translationForSecond) {
+//            delete intersection;
+//            continue;
+//        }
         std::vector<glm::vec3> secondTriangle;
         glm::vec3 &vec = *translationForSecond;
         for (auto &vertex: intersection->secondTriangle) {
