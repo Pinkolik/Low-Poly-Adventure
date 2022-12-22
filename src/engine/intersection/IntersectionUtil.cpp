@@ -24,14 +24,10 @@ IntersectionUtil::getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle
             return nullptr;
         }
         float intersectionLen = firstProj.findIntersectionLength(secondProj);
-        if (intersectionLen < trans) {
-            trans = intersectionLen;
+        if (axis == firstTriangleNormal) {
             mtvAxis = axis;
+            trans = intersectionLen;
         }
-//        if (axis == firstTriangleNormal) {
-//            mtvAxis = axis;
-//            trans = intersectionLen;
-//        }
     }
     glm::vec3 mtv = glm::vec3(mtvAxis * trans * 1.5f);
     return new IntersectionResult{firstTriangle, firstTriangleNormal, secondTriangle, secondTriangleNormal, mtv};
@@ -110,10 +106,6 @@ IntersectionUtil::recalculateIntersections(std::vector<IntersectionResult *> &in
     }
     std::vector<IntersectionResult *> result;
     for (auto &intersection: intersections) {
-//        if (&(intersection->mtv) != translationForSecond) {
-//            delete intersection;
-//            continue;
-//        }
         std::vector<glm::vec3> secondTriangle;
         glm::vec3 &vec = *translationForSecond;
         for (auto &vertex: intersection->secondTriangle) {
@@ -129,4 +121,20 @@ IntersectionUtil::recalculateIntersections(std::vector<IntersectionResult *> &in
         delete intersection;
     }
     return result;
+}
+
+glm::vec3 *IntersectionUtil::getSmallestVec(std::vector<IntersectionResult *> &intersections) {
+    glm::vec3 *res = nullptr;
+    float minLen = INFINITY;
+    if (!intersections.empty()) {
+        for (auto &intersection: intersections) {
+            float len = glm::length(intersection->mtv);
+            if (len < minLen) {
+                minLen = len;
+                res = &(intersection->mtv);
+            }
+        }
+
+    }
+    return res;
 }

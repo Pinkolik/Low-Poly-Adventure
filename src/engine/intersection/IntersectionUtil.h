@@ -21,6 +21,8 @@ public:
 
     static glm::vec3 *getMostOppositeVec(std::vector<IntersectionResult *> &intersections, glm::vec3 direction);
 
+    static glm::vec3 *getSmallestVec(std::vector<IntersectionResult *> &intersections);
+
 private:
     static std::vector<glm::vec3>
     getSeparatingAxes(std::vector<glm::vec3> &triangle,
