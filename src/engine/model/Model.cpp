@@ -23,14 +23,14 @@ glm::vec3 Model::getSpawnPos() {
     return glm::vec3(0);
 }
 
-std::vector<IntersectionResult *> Model::getMinimumTranslationVec(Model &other) {
-    std::vector<IntersectionResult *> res;
+std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) {
+    std::vector<glm::vec3 *> res;
     for (auto &node: nodes) {
         for (auto &otherNode: other.nodes) {
-            std::vector<IntersectionResult *> intersections =
+            std::vector<glm::vec3 *> mtvs =
                     node.getMinimumTranslationVec(position, otherNode, other.position);
-            if (!intersections.empty()) {
-                res.insert(res.end(), intersections.begin(), intersections.end());
+            if (!mtvs.empty()) {
+                res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
         }
     }
@@ -86,8 +86,11 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     std::vector<double> scale = gltfNode.scale;
     std::vector<double> translation = gltfNode.translation;
 
-    tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
-    Mesh mesh = processMesh(gltfModel, gltfMesh);
+    Mesh *mesh = nullptr;
+    if (gltfNode.mesh != -1) {
+        tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
+        mesh = new Mesh(processMesh(gltfModel, gltfMesh));
+    }
 
     Node node = Node(rotation, scale, translation, mesh);
     for (int i: gltfNode.children) {

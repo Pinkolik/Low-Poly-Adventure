@@ -6,7 +6,6 @@
 #include "Texture.h"
 #include "Vertex.h"
 #include "../intersection/AABB.h"
-#include "../intersection/IntersectionResult.h"
 #include <vector>
 
 class Primitive {
@@ -17,7 +16,7 @@ public:
 
     void draw(Shader &shader);
 
-    std::vector<IntersectionResult *> getMinimumTranslationVec(glm::mat4 &modelMat, Primitive &other, glm::mat4 &otherModelMat);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(glm::mat4 &modelMat, Primitive &other, glm::mat4 &otherModelMat);
 
     Texture &getTexture();
 
@@ -31,8 +30,6 @@ public:
 
 private:
     unsigned int VAO = 0;
-    unsigned int VBO = 0;
-    unsigned int EBO = 0;
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
     Texture texture;

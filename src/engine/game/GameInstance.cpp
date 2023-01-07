@@ -39,8 +39,8 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
 
     //first gravity
     player->applyForce(gravity);
-    std::vector<IntersectionResult *> intersections = map->getModel().getMinimumTranslationVec(player->getModel());
-    mtv = IntersectionUtil::getMostOppositeVec(intersections, gravity);
+    std::vector<glm::vec3 *> mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
+    mtv = IntersectionUtil::getMostOppositeVec(mtvs, gravity);
     if (mtv != nullptr) {
         std::cout << "Applying gravity force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
         player->applyForce(*mtv);
@@ -48,19 +48,19 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     } else {
         fallTime += deltaTime;
     }
-    for (auto &item: intersections) {
+    for (auto &item: mtvs) {
         delete item;
     }
 
     player->applyForce(move);
-    intersections = map->getModel().getMinimumTranslationVec(player->getModel());
+    mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
     //second movement
-    mtv = IntersectionUtil::getMostOppositeVec(intersections, move);
+    mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
     if (mtv != nullptr) {
         std::cout << "Applying move force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
         player->applyForce(*mtv);
     }
-    for (auto &item: intersections) {
+    for (auto &item: mtvs) {
         delete item;
     }
     std::cout << "--------------------------END--------------------------" << std::endl;

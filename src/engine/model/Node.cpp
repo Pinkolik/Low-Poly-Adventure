@@ -7,7 +7,7 @@
 #include "../intersection/IntersectionUtil.h"
 
 Node::Node(std::vector<double> rotation, std::vector<double> scale,
-           std::vector<double> translation, Mesh &mesh)
+           std::vector<double> translation, Mesh *mesh)
         : mesh(mesh) {
 
     if (!rotation.empty()) {
@@ -22,18 +22,22 @@ Node::Node(std::vector<double> rotation, std::vector<double> scale,
                 glm::vec3(translation[0], translation[1], translation[2]);
     }
 
-    glm::mat4 modelMat = getModelMat(PositionStruct());
-    for (auto &primitive: this->mesh.getPrimitives()) {
-        if (primitive.getTexture().name == "spawn") {
-            spawn = true;
+    if (this->mesh != nullptr) {
+        glm::mat4 modelMat = getModelMat(PositionStruct());
+        for (auto &primitive: this->mesh->getPrimitives()) {
+            if (primitive.getTexture().name == "spawn") {
+                spawn = true;
+            }
+            primitive.calculateAABB(modelMat);
         }
-        primitive.calculateAABB(modelMat);
     }
 }
 
 void Node::buffer() {
-    for (Primitive &primitive: mesh.getPrimitives()) {
-        primitive.buffer();
+    if (mesh != nullptr) {
+        for (Primitive &primitive: mesh->getPrimitives()) {
+            primitive.buffer();
+        }
     }
 
     for (Node &childNode: children) {
@@ -44,8 +48,10 @@ void Node::buffer() {
 void Node::draw(Shader &shader, PositionStruct modelPos) {
     glm::mat4 modelMat = getModelMat(modelPos);
     shader.setMatrix4f("model", modelMat);
-    for (Primitive &primitive: mesh.getPrimitives()) {
-        primitive.draw(shader);
+    if (mesh != nullptr) {
+        for (Primitive &primitive: mesh->getPrimitives()) {
+            primitive.draw(shader);
+        }
     }
 
     for (Node &childNode: children) {
@@ -69,40 +75,36 @@ glm::mat4 Node::getModelMat(PositionStruct modelPos) const {
     return modelMat;
 }
 
-std::vector<IntersectionResult *> Node::getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
-                                                                 PositionStruct &otherModelPos) {
-    std::vector<IntersectionResult *> res;
-    glm::mat4 modelMat = getModelMat(modelPos);
-    glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
-    for (Primitive &primitive: mesh.getPrimitives()) {
-        for (Primitive &otherPrimitive: other.mesh.getPrimitives()) {
-            bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive,
-                                                                   otherModelPos.translation);
-            if (!isAabbIntersecting) {
-                continue;
-            }
-            std::vector<IntersectionResult *> intersections = primitive.getMinimumTranslationVec(modelMat,
-                                                                                                 otherPrimitive,
-                                                                                                 otherModelMat);
-            if (!intersections.empty()) {
-                res.insert(res.end(), intersections.begin(), intersections.end());
+std::vector<glm::vec3 *> Node::getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                        PositionStruct &otherModelPos) {
+    std::vector<glm::vec3 *> res;
+    if (mesh != nullptr) {
+        glm::mat4 modelMat = getModelMat(modelPos);
+        glm::mat4 otherModelMat = other.getModelMat(otherModelPos);
+        for (Primitive &primitive: mesh->getPrimitives()) {
+            for (Primitive &otherPrimitive: other.mesh->getPrimitives()) {
+                bool isAabbIntersecting = primitive.isAABBIntersecting(modelPos.translation, otherPrimitive,
+                                                                       otherModelPos.translation);
+                if (!isAabbIntersecting) {
+                    continue;
+                }
+                std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(modelMat,
+                                                                                   otherPrimitive,
+                                                                                   otherModelMat);
+                if (!mtvs.empty()) {
+                    res.insert(res.end(), mtvs.begin(), mtvs.end());
+                }
             }
         }
     }
 
     for (Node &childNode: children) {
-        std::vector<IntersectionResult *> intersections =
+        std::vector<glm::vec3 *> mtvs =
                 childNode.getMinimumTranslationVec(modelPos, other, otherModelPos);
-        if (!intersections.empty()) {
-            res.insert(res.end(), intersections.begin(), intersections.end());
+        if (!mtvs.empty()) {
+            res.insert(res.end(), mtvs.begin(), mtvs.end());
         }
     }
     return res;
 }
 
-glm::mat4 Node::getModelMatWithoutRotation(PositionStruct modelPos) const {
-    glm::mat4 translationMat = glm::translate(glm::mat4(1), modelPos.translation);
-    glm::mat4 scaleMat = glm::scale(glm::mat4(1), modelPos.scale);
-    glm::mat4 modelMat = translationMat * scaleMat;
-    return modelMat;
-}

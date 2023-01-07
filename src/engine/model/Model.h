@@ -25,7 +25,7 @@ public:
 
     glm::vec3 getSpawnPos();
 
-    std::vector<IntersectionResult *> getMinimumTranslationVec(Model &other);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other);
 
 private:
     std::vector<Node> nodes;
@@ -45,7 +45,7 @@ private:
     createFloatArrayVector(tinygltf::Model &gltfModel,
                            unsigned int accessor, size_t floatArrSize);
 
-    std::vector<unsigned short>
+    static std::vector<unsigned short>
     createUnsignedShortVector(tinygltf::Model &gltfModel,
                               unsigned int accessor);
 };

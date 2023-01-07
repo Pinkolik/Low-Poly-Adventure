@@ -11,7 +11,7 @@
 class Node {
 public:
     Node(std::vector<double> rotation, std::vector<double> scale,
-         std::vector<double> translation, Mesh &mesh);
+         std::vector<double> translation, Mesh *mesh);
 
     void buffer();
 
@@ -23,18 +23,17 @@ public:
 
     glm::vec3 getTranslation() const;
 
-    std::vector<IntersectionResult *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
-                                                               PositionStruct &otherModelPos);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
+                                                      PositionStruct &otherModelPos);
 
 private:
-    Mesh mesh;
+    Mesh *mesh;
     PositionStruct position;
     std::vector<Node> children;
     bool spawn = false;
 
     glm::mat4 getModelMat(PositionStruct modelPos) const;
 
-    glm::mat4 getModelMatWithoutRotation(PositionStruct modelPos) const;
 };
 
 #endif
