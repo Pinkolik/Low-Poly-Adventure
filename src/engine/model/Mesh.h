@@ -6,11 +6,18 @@
 
 class Mesh {
 public:
-    explicit Mesh(std::vector<Primitive> &primitives);
+    Mesh(int id, std::vector<Primitive> &primitives);
 
-    std::vector<Primitive> &getPrimitives();
+    const std::vector<Primitive> &getPrimitives() const;
+
+    int getId() const;
+
+    void buffer();
+
+    std::vector<AABB *> calculateAABBs(glm::mat4 transMat);
 
 private:
+    const int id;
     std::vector<Primitive> primitives;
 };
 

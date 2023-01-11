@@ -14,16 +14,16 @@ Projection::Projection(glm::vec3 &axis, std::vector<glm::vec3> &triangle) {
     }
 }
 
-bool Projection::isIntersecting(Projection &other) {
+bool Projection::isIntersecting(Projection &other) const {
     return min < other.max && max >= other.min || other.min < max && other.max >= min;
 }
 
-float Projection::findIntersectionLength(Projection &other) {
+float Projection::findIntersectionLength(Projection &other) const {
     if (min < other.max) {
         return fabs(max - other.min);
     } else if (other.min < max) {
         return fabs(other.max - min);
     } else {
-        return INFINITY;
+        return -INFINITY;
     }
 }

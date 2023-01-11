@@ -4,31 +4,23 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-#define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
+#include <cassert>
 #include "../../helpers/tiny_gltf.h"
+#include "ModelUtil.h"
 
 Model::Model(const char *path) { load(path); }
 
-glm::vec3 Model::getSpawnPos() {
-    for (Node &node: nodes) {
-        if (!node.isSpawn()) {
-            continue;
-        }
-        return node.getTranslation();
-    }
-    return glm::vec3(0);
-}
-
-std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) {
+std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) const {
     std::vector<glm::vec3 *> res;
-    for (auto &node: nodes) {
-        for (auto &otherNode: other.nodes) {
-            std::vector<glm::vec3 *> mtvs =
-                    node.getMinimumTranslationVec(position, otherNode, other.position);
+    glm::mat4 transMat = ModelUtil::getTransMatWithoutRotation(transform);
+    glm::mat4 otherTransMat = ModelUtil::getTransMatWithoutRotation(other.transform);
+    for (const auto &node: nodes) {
+        for (const auto &otherNode: other.nodes) {
+            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
+            if (!isAabbIntersecting) {
+                continue;
+            }
+            std::vector<glm::vec3 *> mtvs = node.getMinimumTranslationVec(transMat, otherNode, otherTransMat);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
@@ -44,11 +36,9 @@ void Model::buffer() {
 }
 
 void Model::draw(Shader &shader) {
+    glm::mat4 transMat = ModelUtil::getTransMat(transform);
     for (Node &node: nodes) {
-        // if (node.isSpawn()) {
-        //   continue;
-        // }
-        node.draw(shader, position);
+        node.draw(shader, transMat);
     }
 }
 
@@ -79,6 +69,11 @@ void Model::load(const char *path) {
         Node node = processNode(gltfModel, gltfNode);
         nodes.push_back(node);
     }
+
+    glm::mat4 transMat = glm::mat4(1);
+    for (auto &node: nodes) {
+        node.calculateAABBs(transMat);
+    }
 }
 
 Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
@@ -88,8 +83,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
 
     Mesh *mesh = nullptr;
     if (gltfNode.mesh != -1) {
-        tinygltf::Mesh &gltfMesh = gltfModel.meshes[gltfNode.mesh];
-        mesh = new Mesh(processMesh(gltfModel, gltfMesh));
+        mesh = processMesh(gltfModel, gltfNode.mesh);
     }
 
     Node node = Node(rotation, scale, translation, mesh);
@@ -101,92 +95,65 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
     return node;
 }
 
-Mesh Model::processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh) {
+Mesh *Model::processMesh(tinygltf::Model &gltfModel, int meshId) {
+    for (auto &loadedMesh: loadedMeshes) {
+        if (loadedMesh->getId() == meshId) {
+            return loadedMesh;
+        }
+    }
+    tinygltf::Mesh &gltfMesh = gltfModel.meshes[meshId];
     std::vector<Primitive> primitives;
     for (auto &gltfPrimitive: gltfMesh.primitives) {
-        std::vector<std::vector<float>> normals;
-        std::vector<std::vector<float>> positions;
-        std::vector<std::vector<float>> texcoord;
-        for (auto &attrib: gltfPrimitive.attributes) {
-            std::cout << attrib.first << std::endl;
-            unsigned int accessor = attrib.second;
-            if (attrib.first == "NORMAL") {
-                normals = createFloatArrayVector(gltfModel, accessor, 3);
-            } else if (attrib.first == "POSITION") {
-                positions = createFloatArrayVector(gltfModel, accessor, 3);
-            } else if (attrib.first == "TEXCOORD_0") {
-                texcoord = createFloatArrayVector(gltfModel, accessor, 2);
-            }
-        }
-        assert(normals.size() == positions.size() &&
-               positions.size() == texcoord.size());
-
-        std::vector<Vertex> vertices;
-        for (size_t j = 0; j < normals.size(); j++) {
-            Vertex vertex{};
-            vertex.position =
-                    glm::vec3(positions[j][0], positions[j][1], positions[j][2]);
-            vertex.normal = glm::vec3(normals[j][0], normals[j][1], normals[j][2]);
-            vertex.texCoord = glm::vec2(texcoord[j][0], texcoord[j][1]);
-            vertices.push_back(vertex);
-        }
-        std::vector<unsigned short> indices =
-                createUnsignedShortVector(gltfModel, gltfPrimitive.indices);
-        Texture texture = processTexture(gltfModel, gltfPrimitive.material);
-        Primitive primitive = Primitive(vertices, indices, texture);
+        Primitive primitive = processPrimitive(gltfModel, gltfPrimitive);
         primitives.push_back(primitive);
     }
-    Mesh mesh = Mesh(primitives);
-    return mesh;
+    Mesh *pMesh = new Mesh(meshId, primitives);
+    loadedMeshes.push_back(pMesh);
+    return pMesh;
 }
 
-std::vector<std::vector<float>>
-Model::createFloatArrayVector(tinygltf::Model &gltfModel,
-                              const unsigned int accessor,
-                              size_t floatArrSize) {
-    tinygltf::Accessor &gltfAccessor = gltfModel.accessors[accessor];
-    tinygltf::BufferView &bufferView =
-            gltfModel.bufferViews[gltfAccessor.bufferView];
-    tinygltf::Buffer &buffer = gltfModel.buffers[bufferView.buffer];
-    std::vector<std::vector<float>> res;
-    for (size_t j = 0; j < gltfAccessor.count; j++) {
-        unsigned char *c = buffer.data.data() + bufferView.byteOffset +
-                           j * sizeof(float) * floatArrSize;
-
-        float floatArray[floatArrSize];
-        mempcpy(floatArray, c, sizeof(float) * floatArrSize);
-        std::vector<float> floatVec;
-        for (size_t k = 0; k < floatArrSize; k++) {
-            floatVec.push_back(floatArray[k]);
+Primitive Model::processPrimitive(tinygltf::Model &gltfModel, tinygltf::Primitive &gltfPrimitive) {
+    std::vector<std::vector<float>> normals;
+    std::vector<std::vector<float>> positions;
+    std::vector<std::vector<float>> texcoord;
+    for (auto &attrib: gltfPrimitive.attributes) {
+        std::cout << attrib.first << std::endl;
+        unsigned int accessor = attrib.second;
+        if (attrib.first == "NORMAL") {
+            normals = ModelUtil::createFloatArrayVector(gltfModel, accessor, 3);
+        } else if (attrib.first == "POSITION") {
+            positions = ModelUtil::createFloatArrayVector(gltfModel, accessor, 3);
+        } else if (attrib.first == "TEXCOORD_0") {
+            texcoord = ModelUtil::createFloatArrayVector(gltfModel, accessor, 2);
         }
-        res.push_back(floatVec);
     }
-    return res;
+    assert(normals.size() == positions.size() && positions.size() == texcoord.size());
+
+    std::vector<Vertex> vertices;
+    for (size_t j = 0; j < normals.size(); j++) {
+        Vertex vertex{};
+        vertex.position = glm::vec3(positions[j][0], positions[j][1], positions[j][2]);
+        vertex.normal = glm::vec3(normals[j][0], normals[j][1], normals[j][2]);
+        vertex.texCoord = glm::vec2(texcoord[j][0], texcoord[j][1]);
+        vertices.push_back(vertex);
+    }
+    std::vector<unsigned short> indices = ModelUtil::createUnsignedShortVector(gltfModel, gltfPrimitive.indices);
+    Texture *texture = processTexture(gltfModel, gltfPrimitive.material);
+    Primitive primitive = Primitive(vertices, indices, texture);
+    return primitive;
 }
 
-std::vector<unsigned short>
-Model::createUnsignedShortVector(tinygltf::Model &gltfModel,
-                                 const unsigned int accessor) {
-    tinygltf::Accessor &gltfAccessor = gltfModel.accessors[accessor];
-    tinygltf::BufferView &bufferView =
-            gltfModel.bufferViews[gltfAccessor.bufferView];
-    tinygltf::Buffer &buffer = gltfModel.buffers[bufferView.buffer];
-    std::vector<unsigned short> res;
-    for (size_t j = 0; j < gltfAccessor.count; j++) {
-        unsigned char *c =
-                buffer.data.data() + bufferView.byteOffset + j * sizeof(unsigned short);
-        unsigned short s;
-        memcpy(&s, c, sizeof(unsigned short));
-        res.push_back(s);
-    }
-    return res;
-}
-
-Texture Model::processTexture(tinygltf::Model &gltfModel,
-                              const unsigned int material) {
+Texture *Model::processTexture(tinygltf::Model &gltfModel,
+                               const unsigned int material) {
     tinygltf::Material &gltfMaterial = gltfModel.materials[material];
     int textureIdx = gltfMaterial.pbrMetallicRoughness.baseColorTexture.index;
+
     tinygltf::Texture &gltfTexture = gltfModel.textures[textureIdx];
+    for (auto &texture: loadedTextures) {
+        if (texture->source == gltfTexture.source) {
+            return texture;
+        }
+    }
     tinygltf::Image &gltfImage = gltfModel.images[gltfTexture.source];
     size_t size = gltfImage.image.size();
     std::cout << "Image " << gltfImage.name << " size " << size << std::endl;
@@ -205,7 +172,7 @@ Texture Model::processTexture(tinygltf::Model &gltfModel,
         format = GL_RED;
     } else if (nrComponents == 3) {
         format = GL_RGB;
-    } else if (nrComponents == 4) {
+    } else {
         format = GL_RGBA;
     }
 
@@ -218,14 +185,17 @@ Texture Model::processTexture(tinygltf::Model &gltfModel,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    Texture tex{texId, gltfImage.name};
+    auto *tex = new Texture{gltfTexture.source, texId, gltfImage.name};
+    loadedTextures.push_back(tex);
     return tex;
 }
 
 void Model::setTranslation(glm::vec3 translation) {
-    position.translation = translation;
+    transform.translation = translation;
 }
 
-void Model::setScale(glm::vec3 scale) { position.scale = scale; }
+void Model::setScale(glm::vec3 scale) { transform.scale = scale; }
 
-void Model::setRotation(glm::quat rotation) { position.rotation = rotation; }
+const std::vector<Node> &Model::getNodes() const {
+    return nodes;
+}

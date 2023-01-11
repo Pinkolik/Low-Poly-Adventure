@@ -2,7 +2,7 @@
 #define NODE_H
 
 #include "Mesh.h"
-#include "PositionStruct.h"
+#include "TransformationStruct.h"
 #include "../../shader/Shader.h"
 #include "glm/vec3.hpp"
 #include "../intersection/AABB.h"
@@ -15,24 +15,29 @@ public:
 
     void buffer();
 
-    void draw(Shader &shader, PositionStruct modelPos);
+    void draw(Shader &shader, glm::mat4 transMat);
 
     void addChild(Node &child);
 
-    bool isSpawn() const;
+    void calculateAABBs(glm::mat4 transMat);
 
-    glm::vec3 getTranslation() const;
+    bool isAABBIntersecting(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const;
 
-    std::vector<glm::vec3 *> getMinimumTranslationVec(PositionStruct &modelPos, Node &other,
-                                                      PositionStruct &otherModelPos);
+    const Mesh *getMesh() const;
+
+    const TransformationStruct &getTransform() const;
+
+    const std::vector<Node> &getChildren() const;
+
+    std::vector<glm::vec3 *>
+    getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const;
 
 private:
-    Mesh *mesh;
-    PositionStruct position;
-    std::vector<Node> children;
-    bool spawn = false;
 
-    glm::mat4 getModelMat(PositionStruct modelPos) const;
+    Mesh *mesh = nullptr;
+    std::vector<AABB *> aabbs;
+    TransformationStruct transform;
+    std::vector<Node> children;
 
 };
 

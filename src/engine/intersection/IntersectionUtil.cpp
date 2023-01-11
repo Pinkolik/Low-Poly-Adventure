@@ -15,7 +15,7 @@ IntersectionUtil::getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle
     separatingAxes.push_back(secondTriangleNormal);
     separatingAxes.insert(separatingAxes.end(), firstAxes.begin(), firstAxes.end());
     separatingAxes.insert(separatingAxes.end(), secondAxes.begin(), secondAxes.end());
-    float trans = INFINITY;
+    float trans;
     glm::vec3 mtvAxis;
     for (auto &axis: separatingAxes) {
         Projection firstProj = Projection(axis, firstTriangle);
@@ -79,7 +79,7 @@ glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<glm::vec3 *> &mtvs, 
     glm::vec3 minNormMtv;
     if (!mtvs.empty()) {
         glm::vec3 normDir = glm::normalize(direction);
-        std::cout << "Norm Dir: " << normDir.x << ", " << normDir.y << ", " << normDir.z << std::endl;
+//        std::cout << "Norm Dir: " << normDir.x << ", " << normDir.y << ", " << normDir.z << std::endl;
         for (auto &mtv: mtvs) {
             glm::vec3 normMtv = glm::normalize(*mtv);
             float dot = glm::dot(normDir, normMtv);
@@ -92,7 +92,7 @@ glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<glm::vec3 *> &mtvs, 
 
     }
     if (res != nullptr) {
-        std::cout << "Min Norm MTV: " << minNormMtv.x << ", " << minNormMtv.y << ", " << minNormMtv.z << std::endl;
+//        std::cout << "Min Norm MTV: " << minNormMtv.x << ", " << minNormMtv.y << ", " << minNormMtv.z << std::endl;
     }
     return res;
 }

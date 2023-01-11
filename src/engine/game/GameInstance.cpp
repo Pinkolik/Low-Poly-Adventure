@@ -34,7 +34,7 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     glm::vec3 move = player->processKeyboard(window, deltaTime);
 
 
-    std::cout << "--------------------------BEGIN--------------------------" << std::endl;
+//    std::cout << "--------------------------BEGIN--------------------------" << std::endl;
     glm::vec3 *mtv;
 
     //first gravity
@@ -42,7 +42,7 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     std::vector<glm::vec3 *> mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
     mtv = IntersectionUtil::getMostOppositeVec(mtvs, gravity);
     if (mtv != nullptr) {
-        std::cout << "Applying gravity force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
+//        std::cout << "Applying gravity force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
         player->applyForce(*mtv);
         fallTime = 0.0f;
     } else {
@@ -57,13 +57,13 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     //second movement
     mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
     if (mtv != nullptr) {
-        std::cout << "Applying move force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
+//        std::cout << "Applying move force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
         player->applyForce(*mtv);
     }
     for (auto &item: mtvs) {
         delete item;
     }
-    std::cout << "--------------------------END--------------------------" << std::endl;
+//    std::cout << "--------------------------END--------------------------" << std::endl;
 
 }
 

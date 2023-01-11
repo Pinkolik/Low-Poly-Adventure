@@ -4,6 +4,7 @@
 #include <string>
 
 struct Texture {
+    const int source;
     unsigned int id;
     std::string name;
 };

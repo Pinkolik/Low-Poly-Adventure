@@ -14,7 +14,7 @@ class AABB {
 public:
     AABB(glm::vec3 min, glm::vec3 max);
 
-    bool isIntersecting(glm::vec3 translation, AABB *other, glm::vec3 otherTranslation);
+    bool isIntersecting(glm::mat4 transMat, AABB *other, glm::mat4 otherTransMat);
 
 private:
     glm::vec3 min, max;

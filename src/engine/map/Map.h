@@ -14,6 +14,8 @@ public:
 private:
 
     Model model;
+
+    const glm::vec3 *getSpawnPos(const Node &node, glm::vec3 &translation);
 };
 
 #endif
