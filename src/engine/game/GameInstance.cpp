@@ -33,37 +33,13 @@ void GameInstance::tick(GLFWwindow *window, const float deltaTime) {
     glm::vec3 gravity = glm::vec3(0, GRAVITY * fallTime * fallTime, 0);
     glm::vec3 move = player->processKeyboard(window, deltaTime);
 
-
-//    std::cout << "--------------------------BEGIN--------------------------" << std::endl;
-    glm::vec3 *mtv;
-
-    //first gravity
-    player->applyForce(gravity);
-    std::vector<glm::vec3 *> mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
-    mtv = IntersectionUtil::getMostOppositeVec(mtvs, gravity);
-    if (mtv != nullptr) {
-//        std::cout << "Applying gravity force: " << mtv->x << ", " << mtv->y << ", " << mtv->z << std::endl;
-        player->applyForce(*mtv);
+    if (processIntersectionWithMap(gravity)) {
         fallTime = 0.0f;
     } else {
         fallTime += deltaTime;
     }
-    for (auto &item: mtvs) {
-        delete item;
-    }
 
-    player->applyForce(move);
-    mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
-    //second movement
-    mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
-    if (mtv != nullptr) {
-//        std::cout << "Applying move force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
-        player->applyForce(*mtv);
-    }
-    for (auto &item: mtvs) {
-        delete item;
-    }
-//    std::cout << "--------------------------END--------------------------" << std::endl;
+    processIntersectionWithMap(move);
 
 }
 
@@ -74,4 +50,28 @@ void GameInstance::processMouseMovement(float xOffset, float yOffset) {
 void GameInstance::processResize(const int newWidth, const int newHeight) {
     width = newWidth;
     height = newHeight;
+}
+
+bool GameInstance::processIntersectionWithMap(glm::vec3 move) {
+    bool wasApplied = false;
+    glm::vec3 *mtv;
+    bool exit = false;
+
+    player->applyForce(move);
+
+    std::vector<glm::vec3 *> mtvs = std::vector<glm::vec3 *>();
+    while (!exit) {
+        mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
+        mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
+        if (mtv != nullptr) {
+            player->applyForce(*mtv);
+            wasApplied = true;
+        } else {
+            exit = true;
+        }
+        for (auto &item: mtvs) {
+            delete item;
+        }
+    }
+    return wasApplied;
 }

@@ -3,7 +3,6 @@
 #include "Projection.h"
 #include <glm/glm.hpp>
 #include <vector>
-#include <iostream>
 
 glm::vec3 *
 IntersectionUtil::getMinimumTranslationVec(std::vector<glm::vec3> &firstTriangle, glm::vec3 &firstTriangleNormal,

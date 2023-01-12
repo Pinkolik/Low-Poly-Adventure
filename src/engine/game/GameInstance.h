@@ -35,6 +35,8 @@ private:
 
     Shader shader = Shader("resources/shaders/vShader.glsl",
                            "resources/shaders/fShader.glsl");
+
+    bool processIntersectionWithMap(glm::vec3 move);
 };
 
 
