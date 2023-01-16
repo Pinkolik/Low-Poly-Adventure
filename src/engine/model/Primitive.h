@@ -31,7 +31,8 @@ private:
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
     Texture *texture = nullptr;
-    std::vector<glm::vec3> getTriangleVertices(int idx, const glm::mat4 &transMat) const;
+
+    void getTriangleVertices(int idx, const glm::mat4 &transMat, glm::vec3 *retVertices) const;
 
     glm::vec3 getTriangleNormal(int idx, const glm::mat4 &transMat) const;
 

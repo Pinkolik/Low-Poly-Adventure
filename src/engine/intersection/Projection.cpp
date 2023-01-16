@@ -2,8 +2,9 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
-Projection::Projection(glm::vec3 &axis, std::vector<glm::vec3> &triangle) {
-    for (auto &point: triangle) {
+Projection::Projection(glm::vec3 &axis, glm::vec3 *triangle) {
+    for (int i = 0; i < 3; i++) {
+        glm::vec3 point = triangle[i];
         float proj = glm::dot(axis, point);
         if (proj < min) {
             min = proj;

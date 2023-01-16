@@ -1,8 +1,10 @@
+#include <iostream>
 #include "Primitive.h"
 #include "../intersection/IntersectionUtil.h"
 #include "Texture.h"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/vec3.hpp"
+#include "../../helpers/tri_tri_intersect.h"
 
 Primitive::Primitive(std::vector<Vertex> &vertices,
                      std::vector<unsigned short> &indices, Texture *texture)
@@ -53,14 +55,18 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
                                     const glm::mat4 &otherTransMat) const {
     std::vector<glm::vec3 *> res;
     for (int i = 0; i < indices.size(); i += 3) {
-        std::vector<glm::vec3> firstTriangle = getTriangleVertices(i, transMat);
+        glm::vec3 firstTriangle[3];
+        getTriangleVertices(i, transMat, firstTriangle);
         glm::vec3 firstTriangleNormal = getTriangleNormal(i, transMat);
         for (int j = 0; j < other.indices.size(); j += 3) {
-            std::vector<glm::vec3> secondTriangle = other.getTriangleVertices(j, otherTransMat);
+            glm::vec3 secondTriangle[3];
+            other.getTriangleVertices(j, otherTransMat, secondTriangle);
             glm::vec3 secondTriangleNormal = other.getTriangleNormal(j, otherTransMat);
-            glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal,
-                                                                        secondTriangle, secondTriangleNormal);
-            if (mtv != nullptr) {
+            int isIntersecting = tri_tri_intersect(firstTriangle, firstTriangleNormal, secondTriangle,
+                                                   secondTriangleNormal);
+            if (isIntersecting) {
+                glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal,
+                                                                            secondTriangle);
                 res.push_back(mtv);
                 break;
             }
@@ -69,12 +75,10 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
     return res;
 }
 
-std::vector<glm::vec3> Primitive::getTriangleVertices(int idx, const glm::mat4 &transMat) const {
-    std::vector<glm::vec3> triangle;
-    triangle.emplace_back(transMat * glm::vec4(vertices[indices[idx]].position, 1.0f));
-    triangle.emplace_back(transMat * glm::vec4(vertices[indices[idx + 1]].position, 1.0f));
-    triangle.emplace_back(transMat * glm::vec4(vertices[indices[idx + 2]].position, 1.0f));
-    return triangle;
+void Primitive::getTriangleVertices(int idx, const glm::mat4 &transMat, glm::vec3 *retVertices) const {
+    retVertices[0] = transMat * glm::vec4(vertices[indices[idx]].position, 1.0f);
+    retVertices[1] = transMat * glm::vec4(vertices[indices[idx + 1]].position, 1.0f);
+    retVertices[2] = transMat * glm::vec4(vertices[indices[idx + 2]].position, 1.0f);
 }
 
 glm::vec3 Primitive::getTriangleNormal(int idx, const glm::mat4 &transMat) const {
