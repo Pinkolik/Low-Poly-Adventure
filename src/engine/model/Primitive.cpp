@@ -61,9 +61,13 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
         for (int j = 0; j < other.indices.size(); j += 3) {
             glm::vec3 secondTriangle[3];
             other.getTriangleVertices(j, otherTransMat, secondTriangle);
-            glm::vec3 secondTriangleNormal = other.getTriangleNormal(j, otherTransMat);
-            int isIntersecting = tri_tri_intersect(firstTriangle, firstTriangleNormal, secondTriangle,
-                                                   secondTriangleNormal);
+            float V0[3] = {firstTriangle[0].x, firstTriangle[0].y, firstTriangle[0].z};
+            float V1[3] = {firstTriangle[1].x, firstTriangle[1].y, firstTriangle[1].z};
+            float V2[3] = {firstTriangle[2].x, firstTriangle[2].y, firstTriangle[2].z};
+            float U0[3] = {secondTriangle[0].x, secondTriangle[0].y, secondTriangle[0].z};
+            float U1[3] = {secondTriangle[1].x, secondTriangle[1].y, secondTriangle[1].z};
+            float U2[3] = {secondTriangle[2].x, secondTriangle[2].y, secondTriangle[2].z};
+            int isIntersecting = tri_tri_intersect(V0, V1, V2, U0, U1, U2);
             if (isIntersecting) {
                 glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal,
                                                                             secondTriangle);

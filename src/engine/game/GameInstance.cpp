@@ -4,7 +4,6 @@
 
 #include "GameInstance.h"
 #include "../intersection/IntersectionUtil.h"
-#include <iostream>
 
 GameInstance::GameInstance(const char *mapModelPath, const char *playerModelPath, const int width,
                            const int height) : width(width), height(height) {
@@ -59,7 +58,7 @@ bool GameInstance::processIntersectionWithMap(glm::vec3 move) {
 
     player->applyForce(move);
 
-    std::vector<glm::vec3 *> mtvs = std::vector<glm::vec3 *>();
+    std::vector<glm::vec3 *> mtvs;
     while (!exit) {
         mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
         mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);

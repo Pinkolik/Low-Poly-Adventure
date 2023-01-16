@@ -12,14 +12,14 @@ Model::Model(const char *path) { load(path); }
 
 std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) const {
     std::vector<glm::vec3 *> res;
-    glm::mat4 transMat = ModelUtil::getTransMatWithoutRotation(transform);
-    glm::mat4 otherTransMat = ModelUtil::getTransMatWithoutRotation(other.transform);
+    glm::mat4 transMat = ModelUtil::getTransMat(transform);
+    glm::mat4 otherTransMat = ModelUtil::getTransMat(other.transform);
     for (const auto &node: nodes) {
         for (const auto &otherNode: other.nodes) {
-            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
-            if (!isAabbIntersecting) {
-                continue;
-            }
+//            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
+//            if (!isAabbIntersecting) {
+//                continue;
+//            }
             std::vector<glm::vec3 *> mtvs = node.getMinimumTranslationVec(transMat, otherNode, otherTransMat);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
@@ -117,7 +117,6 @@ Primitive Model::processPrimitive(tinygltf::Model &gltfModel, tinygltf::Primitiv
     std::vector<std::vector<float>> positions;
     std::vector<std::vector<float>> texcoord;
     for (auto &attrib: gltfPrimitive.attributes) {
-        std::cout << attrib.first << std::endl;
         unsigned int accessor = attrib.second;
         if (attrib.first == "NORMAL") {
             normals = ModelUtil::createFloatArrayVector(gltfModel, accessor, 3);
@@ -155,8 +154,6 @@ Texture *Model::processTexture(tinygltf::Model &gltfModel,
         }
     }
     tinygltf::Image &gltfImage = gltfModel.images[gltfTexture.source];
-    size_t size = gltfImage.image.size();
-    std::cout << "Image " << gltfImage.name << " size " << size << std::endl;
 
     unsigned int texId;
 
