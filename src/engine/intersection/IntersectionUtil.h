@@ -3,11 +3,15 @@
 
 #include <glm/vec3.hpp>
 #include <vector>
+#include "AABB.h"
 
 class IntersectionUtil {
 public:
     static glm::vec3 *
     getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &firstTriangleNormal, glm::vec3 *secondTriangle);
+
+    static glm::vec3 *
+    getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &firstTriangleNormal, AABB *aabb);
 
     static glm::vec3 updateIfLess(glm::vec3 &first, glm::vec3 &second);
 

@@ -16,6 +16,12 @@ public:
 
     bool isIntersecting(glm::mat4 transMat, AABB *other, glm::mat4 otherTransMat);
 
+    bool isInside(glm::vec3 *triangle);
+
+    const glm::vec3 &getMin() const;
+
+    const glm::vec3 &getMax() const;
+
 private:
     glm::vec3 min, max;
 };

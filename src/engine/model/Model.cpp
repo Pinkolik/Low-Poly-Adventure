@@ -16,10 +16,10 @@ std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) const {
     glm::mat4 otherTransMat = ModelUtil::getTransMat(other.transform);
     for (const auto &node: nodes) {
         for (const auto &otherNode: other.nodes) {
-            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
-            if (!isAabbIntersecting) {
-                continue;
-            }
+//            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
+//            if (!isAabbIntersecting) {
+//                continue;
+//            }
             std::vector<glm::vec3 *> mtvs = node.getMinimumTranslationVec(transMat, otherNode, otherTransMat);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());

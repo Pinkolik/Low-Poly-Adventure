@@ -51,9 +51,24 @@ void Primitive::draw(Shader &shader) const {
 const Texture *Primitive::getTexture() const { return texture; }
 
 std::vector<glm::vec3 *>
-Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other,
-                                    const glm::mat4 &otherTransMat) const {
+Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
+                                    const std::vector<AABB *> &otherAABBs) const {
     std::vector<glm::vec3 *> res;
+    for (int i = 0; i < indices.size(); i += 3) {
+        glm::vec3 firstTriangle[3];
+        getTriangleVertices(i, transMat, firstTriangle);
+        glm::vec3 firstTriangleNormal = getTriangleNormal(i, transMat);
+        for (const auto &aabb: otherAABBs) {
+            bool isInside = aabb->isInside(firstTriangle);
+            if (isInside) {
+                glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal, aabb);
+                res.push_back(mtv);
+            }
+        }
+    }
+    if (!res.empty()) {
+        return res;
+    }
     for (int i = 0; i < indices.size(); i += 3) {
         glm::vec3 firstTriangle[3];
         getTriangleVertices(i, transMat, firstTriangle);

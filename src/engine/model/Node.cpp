@@ -57,9 +57,11 @@ Node::getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 
         otherTransMat = otherTransMat * ModelUtil::getTransMat(other.transform);
         for (const Primitive &primitive: mesh->getPrimitives()) {
             for (const Primitive &otherPrimitive: other.mesh->getPrimitives()) {
+                std::vector<AABB *> otherAABBS = other.mesh->calculateAABBs(otherTransMat);
                 std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(transMat,
                                                                                    otherPrimitive,
-                                                                                   otherTransMat);
+                                                                                   otherTransMat,
+                                                                                   otherAABBS);
                 if (!mtvs.empty()) {
                     res.insert(res.end(), mtvs.begin(), mtvs.end());
                 }

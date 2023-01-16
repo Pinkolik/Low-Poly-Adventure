@@ -17,7 +17,8 @@ public:
     void draw(Shader &shader) const;
 
     std::vector<glm::vec3 *>
-    getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat) const;
+    getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
+                             const std::vector<AABB *> &otherAABBs) const;
 
     const Texture *getTexture() const;
 
