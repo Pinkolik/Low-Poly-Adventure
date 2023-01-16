@@ -4,7 +4,7 @@
 #include "../../helpers/tiny_gltf.h"
 #include "Mesh.h"
 #include "Node.h"
-#include "PositionStruct.h"
+#include "TransformationStruct.h"
 #include "Primitive.h"
 #include "../../shader/Shader.h"
 #include <vector>
@@ -21,33 +21,27 @@ public:
 
     void setScale(glm::vec3 scale);
 
-    void setRotation(glm::quat rotation);
+    std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other) const;
 
-    glm::vec3 getSpawnPos();
-
-    std::vector<IntersectionResult *> getMinimumTranslationVec(Model &other);
+    const std::vector<Node> &getNodes() const;
 
 private:
     std::vector<Node> nodes;
+    std::vector<Mesh *> loadedMeshes;
+    std::vector<Texture *> loadedTextures;
 
-    PositionStruct position;
+    TransformationStruct transform;
 
     void load(const char *path);
 
     Node processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode);
 
-    Mesh processMesh(tinygltf::Model &gltfModel, tinygltf::Mesh &gltfMesh);
+    Mesh *processMesh(tinygltf::Model &gltfModel, int mesh);
 
-    static Texture processTexture(tinygltf::Model &gltfModel,
-                                  unsigned int material);
+    Primitive processPrimitive(tinygltf::Model &gltfModel, tinygltf::Primitive &gltfPrimitive);
 
-    static std::vector<std::vector<float>>
-    createFloatArrayVector(tinygltf::Model &gltfModel,
-                           unsigned int accessor, size_t floatArrSize);
+    Texture *processTexture(tinygltf::Model &gltfModel, unsigned int material);
 
-    std::vector<unsigned short>
-    createUnsignedShortVector(tinygltf::Model &gltfModel,
-                              unsigned int accessor);
 };
 
 #endif

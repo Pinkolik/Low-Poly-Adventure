@@ -2,8 +2,9 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
-Projection::Projection(glm::vec3 &axis, std::vector<glm::vec3> &triangle) {
-    for (auto &point: triangle) {
+Projection::Projection(glm::vec3 &axis, glm::vec3 *triangle) {
+    for (int i = 0; i < 3; i++) {
+        glm::vec3 point = triangle[i];
         float proj = glm::dot(axis, point);
         if (proj < min) {
             min = proj;
@@ -14,16 +15,16 @@ Projection::Projection(glm::vec3 &axis, std::vector<glm::vec3> &triangle) {
     }
 }
 
-bool Projection::isIntersecting(Projection &other) {
-    return min < other.max && max >= other.min || other.min < max && other.max >= min;
+bool Projection::isIntersecting(Projection &other) const {
+    return min <= other.max && max >= other.min || other.min <= max && other.max >= min;
 }
 
-float Projection::findIntersectionLength(Projection &other) {
-    if (min < other.max) {
-        return fabs(max - other.min);
-    } else if (other.min < max) {
-        return fabs(other.max - min);
+float Projection::findIntersectionLength(Projection &other) const {
+    if (min <= other.max) {
+        return max - other.min;
+    } else if (other.min <= max) {
+        return other.max - min;
     } else {
-        return INFINITY;
+        return -INFINITY;
     }
 }

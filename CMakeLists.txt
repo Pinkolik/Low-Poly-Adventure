@@ -18,6 +18,7 @@ add_executable(Game
         src/helpers/stb_image_write.h
         src/helpers/json.hpp
         src/helpers/tiny_gltf.h
+        src/helpers/tri_tri_intersect.h
         src/shader/Shader.h
         src/shader/Shader.cpp
         src/engine/model/Mesh.h
@@ -30,14 +31,20 @@ add_executable(Game
         src/engine/model/Node.cpp
         src/engine/model/Primitive.h
         src/engine/model/Primitive.cpp
-        src/engine/model/PositionStruct.h
+        src/engine/model/TransformationStruct.h
+        src/engine/model/ModelUtil.cpp
+        src/engine/model/ModelUtil.h
         src/engine/player/Player.h
         src/engine/player/Player.cpp
         src/engine/intersection/IntersectionUtil.h
         src/engine/intersection/IntersectionUtil.cpp
         src/engine/intersection/Projection.h
         src/engine/intersection/Projection.cpp
-        src/engine/game/GameInstance.cpp src/engine/game/GameInstance.h src/engine/intersection/AABB.cpp src/engine/intersection/AABB.h src/engine/intersection/IntersectionResult.h)
+        src/engine/intersection/AABB.cpp
+        src/engine/intersection/AABB.h
+        src/engine/game/GameInstance.cpp
+        src/engine/game/GameInstance.h
+        )
 add_custom_command(
         TARGET Game POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

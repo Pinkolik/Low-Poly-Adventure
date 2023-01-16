@@ -4,7 +4,7 @@
 #include "glm/vec3.hpp"
 #include "glm/gtx/quaternion.hpp"
 
-struct PositionStruct {
+struct TransformationStruct {
     glm::quat rotation = glm::quat(1, 0, 0, 0);
     glm::vec3 scale = glm::vec3(1);
     glm::vec3 translation = glm::vec3(0);

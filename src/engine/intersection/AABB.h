@@ -14,18 +14,16 @@ class AABB {
 public:
     AABB(glm::vec3 min, glm::vec3 max);
 
-    void buffer();
+    bool isIntersecting(glm::mat4 transMat, AABB *other, glm::mat4 otherTransMat);
 
-    void draw(Shader &shader);
+    bool isInside(glm::vec3 *triangle);
 
-    bool isIntersecting(glm::vec3 translation, AABB *other, glm::vec3 otherTranslation);
+    const glm::vec3 &getMin() const;
+
+    const glm::vec3 &getMax() const;
 
 private:
-    unsigned int VAO;
     glm::vec3 min, max;
-    std::vector<glm::vec3> vertices;
-
-    void fillVertices();
 };
 
 

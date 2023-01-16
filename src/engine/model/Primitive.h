@@ -6,41 +6,40 @@
 #include "Texture.h"
 #include "Vertex.h"
 #include "../intersection/AABB.h"
-#include "../intersection/IntersectionResult.h"
 #include <vector>
 
 class Primitive {
 public:
-    Primitive(std::vector<Vertex> &vertices, std::vector<unsigned short> &indices, Texture &texture);
+    Primitive(std::vector<Vertex> &vertices, std::vector<unsigned short> &indices, Texture *texture);
 
     void buffer();
 
-    void draw(Shader &shader);
+    void draw(Shader &shader) const;
 
-    std::vector<IntersectionResult *> getMinimumTranslationVec(glm::mat4 &modelMat, Primitive &other, glm::mat4 &otherModelMat);
+    std::vector<glm::vec3 *>
+    getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
+                             const std::vector<AABB *> &otherAABBs) const;
 
-    Texture &getTexture();
+    const Texture *getTexture() const;
 
-    glm::vec3 getMin(glm::mat4 modelMat);
+    const std::vector<Vertex> &getVertices() const;
 
-    glm::vec3 getMax(glm::mat4 modelMat);
-
-    void calculateAABB(glm::mat4 modelMat);
-
-    bool isAABBIntersecting(glm::vec3 &translation, Primitive &other, glm::vec3 &otherTranslation);
-
+    AABB calculateAABB(glm::mat4 transMat) const;
 private:
+
+    bool buffered = false;
     unsigned int VAO = 0;
-    unsigned int VBO = 0;
-    unsigned int EBO = 0;
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
-    Texture texture;
-    AABB *aabb = nullptr;
+    Texture *texture = nullptr;
 
-    std::vector<glm::vec3> getTriangleVertices(int idx, glm::mat4 &modelMat);
+    void getTriangleVertices(int idx, const glm::mat4 &transMat, glm::vec3 *retVertices) const;
 
-    glm::vec3 getTriangleNormal(int idx, glm::mat4 &modelMat);
+    glm::vec3 getTriangleNormal(int idx, const glm::mat4 &transMat) const;
+
+    glm::vec3 getMin(glm::mat4 transMat) const;
+
+    glm::vec3 getMax(glm::mat4 transMat) const;
 };
 
 #endif

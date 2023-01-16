@@ -25,10 +25,6 @@ public:
 
     glm::mat4 getViewMatrix();
 
-    glm::vec3 getPosition();
-
-    glm::vec3 getFront();
-
     Model &getModel();
 
 private:
@@ -42,10 +38,7 @@ private:
 
     float movementSpeed;
     float mouseSensitivity;
-    float fallTime;
-    float lastPressTime = 0;
 
-    bool thirdPerson = false;
     Model model;
 
     void updatePlayerVectors();
