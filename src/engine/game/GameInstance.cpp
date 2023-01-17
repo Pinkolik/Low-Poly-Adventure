@@ -2,6 +2,7 @@
 // Created by pinkolik on 12/15/22.
 //
 
+#include <iostream>
 #include "GameInstance.h"
 #include "../intersection/IntersectionUtil.h"
 
@@ -62,7 +63,7 @@ bool GameInstance::processIntersectionWithMap(glm::vec3 move) {
     while (!exit) {
         mtvs = map->getModel().getMinimumTranslationVec(player->getModel());
         mtv = IntersectionUtil::getMostOppositeVec(mtvs, move);
-        if (mtv != nullptr) {
+        if (mtv != nullptr && glm::length(*mtv) >= 0.00001f) {
             player->applyForce(*mtv);
             wasApplied = true;
         } else {

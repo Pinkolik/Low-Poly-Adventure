@@ -53,11 +53,14 @@ const Texture *Primitive::getTexture() const { return texture; }
 std::vector<glm::vec3 *>
 Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
                                     const std::vector<AABB *> &otherAABBs) const {
+    glm::vec3 firstVertices[indices.size()];
+    glm::vec3 firstNormals[indices.size() / 3];
     std::vector<glm::vec3 *> res;
     for (int i = 0; i < indices.size(); i += 3) {
-        glm::vec3 firstTriangle[3];
+        glm::vec3 *firstTriangle = firstVertices + i;
         getTriangleVertices(i, transMat, firstTriangle);
-        glm::vec3 firstTriangleNormal = getTriangleNormal(i, transMat);
+        firstNormals[i / 3] = getTriangleNormal(i, transMat);
+        glm::vec3 firstTriangleNormal = firstNormals[i / 3];
         for (const auto &aabb: otherAABBs) {
             bool isInside = aabb->isInside(firstTriangle);
             if (isInside) {
@@ -70,9 +73,8 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
         return res;
     }
     for (int i = 0; i < indices.size(); i += 3) {
-        glm::vec3 firstTriangle[3];
-        getTriangleVertices(i, transMat, firstTriangle);
-        glm::vec3 firstTriangleNormal = getTriangleNormal(i, transMat);
+        glm::vec3 *firstTriangle = firstVertices + i;
+        glm::vec3 firstTriangleNormal = firstNormals[i / 3];
         for (int j = 0; j < other.indices.size(); j += 3) {
             glm::vec3 secondTriangle[3];
             other.getTriangleVertices(j, otherTransMat, secondTriangle);
