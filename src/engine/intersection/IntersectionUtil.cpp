@@ -10,7 +10,7 @@ IntersectionUtil::getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &
     Projection firstProj = Projection(firstTriangleNormal, firstTriangle);
     Projection secondProj = Projection(firstTriangleNormal, secondTriangle);
     float intersectionLen = firstProj.findIntersectionLength(secondProj);
-    return new glm::vec3(firstTriangleNormal * intersectionLen * 2.5f);
+    return new glm::vec3(firstTriangleNormal * intersectionLen * 1.5f);
 }
 
 glm::vec3 IntersectionUtil::updateIfLess(glm::vec3 &first, glm::vec3 &second) {
@@ -74,5 +74,5 @@ IntersectionUtil::getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &
             minLength = length;
         }
     }
-    return new glm::vec3(firstTriangleNormal * minLength * -2.5f);
+    return new glm::vec3(firstTriangleNormal * minLength * -1.5f);
 }
