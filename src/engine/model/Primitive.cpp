@@ -8,7 +8,7 @@
 
 Primitive::Primitive(std::vector<Vertex> &vertices,
                      std::vector<unsigned short> &indices, Texture *texture)
-        : vertices(vertices), indices(indices), texture(texture) {}
+        : vertices(vertices), indices(indices), texture(texture), aabb(glm::vec3(0), glm::vec3()) {}
 
 void Primitive::buffer() {
     if (buffered) {
@@ -51,22 +51,20 @@ void Primitive::draw(Shader &shader) const {
 const Texture *Primitive::getTexture() const { return texture; }
 
 std::vector<glm::vec3 *>
-Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
-                                    const std::vector<AABB *> &otherAABBs) const {
+Primitive::getMinimumTranslationVec(const Primitive &other) const {
     glm::vec3 firstVertices[indices.size()];
     glm::vec3 firstNormals[indices.size() / 3];
     std::vector<glm::vec3 *> res;
+    const AABB &otherAABB = other.aabb;
     for (int i = 0; i < indices.size(); i += 3) {
         glm::vec3 *firstTriangle = firstVertices + i;
-        getTriangleVertices(i, transMat, firstTriangle);
-        firstNormals[i / 3] = getTriangleNormal(i, transMat);
+        getTriangleVertices(i, firstTriangle);
+        firstNormals[i / 3] = vertices[indices[i]].normal;
         glm::vec3 firstTriangleNormal = firstNormals[i / 3];
-        for (const auto &aabb: otherAABBs) {
-            bool isInside = aabb->isInside(firstTriangle);
-            if (isInside) {
-                glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal, aabb);
-                res.push_back(mtv);
-            }
+        bool isInside = otherAABB.isInside(firstTriangle);
+        if (isInside) {
+            glm::vec3 *mtv = IntersectionUtil::getMinimumTranslationVec(firstTriangle, firstTriangleNormal, otherAABB);
+            res.push_back(mtv);
         }
     }
     if (!res.empty()) {
@@ -77,7 +75,7 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
         glm::vec3 firstTriangleNormal = firstNormals[i / 3];
         for (int j = 0; j < other.indices.size(); j += 3) {
             glm::vec3 secondTriangle[3];
-            other.getTriangleVertices(j, otherTransMat, secondTriangle);
+            other.getTriangleVertices(j, secondTriangle);
             float V0[3] = {firstTriangle[0].x, firstTriangle[0].y, firstTriangle[0].z};
             float V1[3] = {firstTriangle[1].x, firstTriangle[1].y, firstTriangle[1].z};
             float V2[3] = {firstTriangle[2].x, firstTriangle[2].y, firstTriangle[2].z};
@@ -96,38 +94,52 @@ Primitive::getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &
     return res;
 }
 
-void Primitive::getTriangleVertices(int idx, const glm::mat4 &transMat, glm::vec3 *retVertices) const {
-    retVertices[0] = transMat * glm::vec4(vertices[indices[idx]].position, 1.0f);
-    retVertices[1] = transMat * glm::vec4(vertices[indices[idx + 1]].position, 1.0f);
-    retVertices[2] = transMat * glm::vec4(vertices[indices[idx + 2]].position, 1.0f);
+void Primitive::getTriangleVertices(int idx, glm::vec3 *retVertices) const {
+    retVertices[0] = vertices[indices[idx]].position;
+    retVertices[1] = vertices[indices[idx + 1]].position;
+    retVertices[2] = vertices[indices[idx + 2]].position;
 }
 
-glm::vec3 Primitive::getTriangleNormal(int idx, const glm::mat4 &transMat) const {
-    return glm::normalize(glm::inverseTranspose(glm::mat3(transMat)) * vertices[indices[idx]].normal);
+glm::vec3 Primitive::getTriangleNormal(int idx) const {
+    return vertices[indices[idx]].normal;
 }
 
 const std::vector<Vertex> &Primitive::getVertices() const {
     return vertices;
 }
 
-glm::vec3 Primitive::getMin(glm::mat4 transMat) const {
+glm::vec3 Primitive::getMin() const {
     glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
     for (const auto &vertex: vertices) {
-        glm::vec3 pos = transMat * glm::vec4(vertex.position, 1.0f);
-        min = IntersectionUtil::updateIfLess(min, pos);
+        IntersectionUtil::updateIfLess(min, vertex.position);
     }
     return min;
 }
 
-glm::vec3 Primitive::getMax(glm::mat4 transMat) const {
+glm::vec3 Primitive::getMax() const {
     glm::vec3 max = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
     for (const auto &vertex: vertices) {
-        glm::vec3 pos = transMat * glm::vec4(vertex.position, 1.0f);
-        max = IntersectionUtil::updateIfGreater(max, pos);
+        IntersectionUtil::updateIfGreater(max, vertex.position);
     }
     return max;
 }
 
-AABB Primitive::calculateAABB(glm::mat4 transMat) const {
-    return {getMin(transMat), getMax(transMat)};
+void Primitive::applyTranslation(glm::mat4 transMat) {
+    const glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(transMat));
+    for (auto &vertex: vertices) {
+        vertex.position = transMat * glm::vec4(vertex.position, 1.0f);
+        vertex.normal = glm::normalize(normalMatrix * vertex.normal);
+    }
+}
+
+void Primitive::calculateAABB() {
+    aabb = {getMin(), getMax()};
+}
+
+const AABB &Primitive::getAabb() const {
+    return aabb;
+}
+
+void Primitive::applyTranslationToAABB(glm::mat4 transMat) {
+    aabb.applyTranslation(transMat);
 }

@@ -23,16 +23,6 @@ Node::Node(std::vector<double> rotation, std::vector<double> scale,
     }
 }
 
-void Node::buffer() {
-    if (mesh != nullptr) {
-        mesh->buffer();
-    }
-
-    for (Node &childNode: children) {
-        childNode.buffer();
-    }
-}
-
 void Node::draw(Shader &shader, glm::mat4 transMat) {
     transMat = transMat * ModelUtil::getTransMat(transform);
     if (mesh != nullptr) {
@@ -47,21 +37,17 @@ void Node::draw(Shader &shader, glm::mat4 transMat) {
     }
 }
 
-void Node::addChild(Node &child) { children.push_back(child); }
+void Node::addChild(Node &child) {
+    children.push_back(child);
+}
 
 std::vector<glm::vec3 *>
-Node::getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const {
+Node::getMinimumTranslationVec(const Node &other) const {
     std::vector<glm::vec3 *> res;
     if (mesh != nullptr && other.mesh != nullptr) {
-        transMat = transMat * ModelUtil::getTransMat(transform);
-        otherTransMat = otherTransMat * ModelUtil::getTransMat(other.transform);
         for (const Primitive &primitive: mesh->getPrimitives()) {
             for (const Primitive &otherPrimitive: other.mesh->getPrimitives()) {
-                std::vector<AABB *> otherAABBS = other.mesh->calculateAABBs(otherTransMat);
-                std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(transMat,
-                                                                                   otherPrimitive,
-                                                                                   otherTransMat,
-                                                                                   otherAABBS);
+                std::vector<glm::vec3 *> mtvs = primitive.getMinimumTranslationVec(otherPrimitive);
                 if (!mtvs.empty()) {
                     res.insert(res.end(), mtvs.begin(), mtvs.end());
                 }
@@ -70,9 +56,8 @@ Node::getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 
     }
 
     if (!children.empty()) {
-        transMat = transMat * ModelUtil::getTransMat(transform);
         for (const auto &child: children) {
-            std::vector<glm::vec3 *> mtvs = child.getMinimumTranslationVec(transMat, other, otherTransMat);
+            std::vector<glm::vec3 *> mtvs = child.getMinimumTranslationVec(other);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
@@ -80,9 +65,8 @@ Node::getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 
     }
 
     if (!other.children.empty()) {
-        otherTransMat = otherTransMat * ModelUtil::getTransMat(other.transform);
         for (const auto &child: other.children) {
-            std::vector<glm::vec3 *> mtvs = getMinimumTranslationVec(transMat, child, otherTransMat);
+            std::vector<glm::vec3 *> mtvs = getMinimumTranslationVec(child);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
@@ -103,40 +87,76 @@ const std::vector<Node> &Node::getChildren() const {
     return children;
 }
 
-void Node::calculateAABBs(glm::mat4 transMat) {
-    transMat = transMat * ModelUtil::getTransMat(transform);
-    if (mesh != nullptr) {
-        std::vector<AABB *> meshAABBs = mesh->calculateAABBs(transMat);
-        aabbs.insert(aabbs.end(), meshAABBs.begin(), meshAABBs.end());
-    }
-    for (auto &child: children) {
-        child.calculateAABBs(transMat);
-    }
-}
-
-bool Node::isAABBIntersecting(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const {
-    if (!aabbs.empty() && !other.aabbs.empty()) {
-        for (const auto &aabb: aabbs) {
-            for (const auto &otherAABB: other.aabbs) {
-                if (aabb->isIntersecting(transMat, otherAABB, otherTransMat)) {
+bool Node::isAABBIntersecting(const Node &other) const {
+    if (mesh != nullptr && other.mesh != nullptr) {
+        for (const Primitive &primitive: mesh->getPrimitives()) {
+            for (const Primitive &otherPrimitive: other.mesh->getPrimitives()) {
+                if (primitive.getAabb().isIntersecting(otherPrimitive.getAabb())) {
                     return true;
                 }
             }
         }
     }
 
-    for (const auto &child: children) {
-        if (child.isAABBIntersecting(transMat, other, otherTransMat)) {
-            return true;
+    if (!children.empty()) {
+        for (const auto &child: children) {
+            if (child.isAABBIntersecting(other)) {
+                return true;
+            }
         }
     }
 
 
-    for (const auto &child: other.children) {
-        if (isAABBIntersecting(transMat, child, otherTransMat)) {
-            return true;
+    if (!other.children.empty()) {
+        for (const auto &child: other.children) {
+            if (isAABBIntersecting(child)) {
+                return true;
+            }
         }
     }
 
     return false;
+}
+
+void Node::applyTranslation(glm::mat4 transMat, bool recalculateAABBs) {
+    if (mesh != nullptr) {
+        mesh->applyTranslation(transMat);
+        if (recalculateAABBs) {
+            mesh->calculateAABBs();
+        } else {
+            mesh->applyTranslationToAABBs(transMat);
+        }
+    } else {
+        for (auto &child: children) {
+            child.applyTranslation(transMat, false);
+        }
+    }
+}
+
+void Node::init(glm::mat4 transMat) {
+    transMat = transMat * ModelUtil::getTransMat(transform);
+    if (mesh != nullptr) {
+        mesh->applyTranslation(transMat);
+        mesh->calculateAABBs();
+    } else {
+        for (auto &child: children) {
+            child.init(transMat);
+        }
+    }
+}
+
+void Node::init() {
+    init(glm::mat4(1));
+}
+
+void Node::translate(glm::vec3 translation) {
+    transform.translation += translation;
+    glm::mat4 transMat = glm::translate(glm::mat4(1), translation);
+    applyTranslation(transMat, false);
+}
+
+void Node::scale(glm::vec3 scale) {
+    transform.scale *= scale;
+    glm::mat4 transMat = glm::scale(glm::mat4(1), scale);
+    applyTranslation(transMat, false);
 }

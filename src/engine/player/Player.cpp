@@ -46,7 +46,10 @@ void Player::processMouseMovement(float xOffset, float yOffset) {
     updatePlayerVectors();
 }
 
-void Player::applyForce(glm::vec3 &force) { position += force; }
+void Player::applyForce(glm::vec3 &force) {
+    position += force;
+    model.translate(force);
+}
 
 void Player::updatePlayerVectors() {
     glm::vec3 direction;
@@ -59,7 +62,6 @@ void Player::updatePlayerVectors() {
 }
 
 Model &Player::getModel() {
-    model.setTranslation(position);
     return model;
 }
 
@@ -67,12 +69,11 @@ Player::Player(const char *playerModelPath, glm::vec3 position, glm::vec3 up, fl
         front(glm::vec3(0.0f, 0.0f, -1.0f)),
         movementSpeed(SPEED),
         mouseSensitivity(SENSITIVITY),
-        position(position),
         worldUp(up),
         yaw(yaw),
         pitch(pitch),
         model(Model(playerModelPath)) {
 
     updatePlayerVectors();
-    model.buffer();
+    applyForce(position);
 }

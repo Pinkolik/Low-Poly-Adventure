@@ -12,13 +12,19 @@ public:
 
     int getId() const;
 
-    void buffer();
+    void applyTranslation(glm::mat4 transMat);
 
-    std::vector<AABB *> calculateAABBs(glm::mat4 transMat);
+    void applyTranslationToAABBs(glm::mat4 transMat);
+
+    void calculateAABBs();
 
 private:
+
     const int id;
     std::vector<Primitive> primitives;
+
+    void buffer();
+
 };
 
 #endif

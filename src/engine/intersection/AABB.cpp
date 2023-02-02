@@ -9,17 +9,13 @@ AABB::AABB(glm::vec3 min, glm::vec3 max) : min(min), max(max) {
 }
 
 
-bool AABB::isIntersecting(glm::mat4 transMat, AABB *other, glm::mat4 otherTransMat) {
-    glm::vec3 firstMin = transMat * glm::vec4(min, 1.0f);
-    glm::vec3 firstMax = transMat * glm::vec4(max, 1.0f);
-    glm::vec3 secondMin = otherTransMat * glm::vec4(other->min, 1.0f);
-    glm::vec3 secondMax = otherTransMat * glm::vec4(other->max, 1.0f);
-    return firstMin.x <= secondMax.x && firstMax.x >= secondMin.x &&
-           firstMin.y <= secondMax.y && firstMax.y >= secondMin.y &&
-           firstMin.z <= secondMax.z && firstMax.z >= secondMin.z;
+bool AABB::isIntersecting(const AABB &other) const {
+    return min.x <= other.max.x && max.x >= other.min.x &&
+           min.y <= other.max.y && max.y >= other.min.y &&
+           min.z <= other.max.z && max.z >= other.min.z;
 }
 
-bool AABB::isInside(glm::vec3 *triangle) {
+bool AABB::isInside(glm::vec3 *triangle) const {
     for (int i = 0; i < 3; i++) {
         glm::vec3 &point = triangle[i];
         if (!(point.x >= min.x && point.x <= max.x &&
@@ -37,4 +33,9 @@ const glm::vec3 &AABB::getMin() const {
 
 const glm::vec3 &AABB::getMax() const {
     return max;
+}
+
+void AABB::applyTranslation(glm::mat4 transMat) {
+    min = transMat * glm::vec4(min, 1.0f);
+    max = transMat * glm::vec4(max, 1.0f);
 }
