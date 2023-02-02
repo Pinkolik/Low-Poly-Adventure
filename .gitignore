@@ -4,7 +4,8 @@
 **/.cproject
 **/.project
 /.vscode
-/cmake-build-debug/
 /.idea
 /Game
+/cmake-build-debug/
 /cmake-build-release/
+/cmake-build-release-windows/
