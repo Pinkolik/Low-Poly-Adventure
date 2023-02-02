@@ -13,32 +13,28 @@ IntersectionUtil::getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &
     return new glm::vec3(firstTriangleNormal * intersectionLen * 1.5f);
 }
 
-glm::vec3 IntersectionUtil::updateIfLess(glm::vec3 &first, glm::vec3 &second) {
-    glm::vec3 res = first;
+void IntersectionUtil::updateIfLess(glm::vec3 &first, const glm::vec3 &second) {
     if (second.x < first.x) {
-        res.x = second.x;
+        first.x = second.x;
     }
     if (second.y < first.y) {
-        res.y = second.y;
+        first.y = second.y;
     }
     if (second.z < first.z) {
-        res.z = second.z;
+        first.z = second.z;
     }
-    return res;
 }
 
-glm::vec3 IntersectionUtil::updateIfGreater(glm::vec3 &first, glm::vec3 &second) {
-    glm::vec3 res = first;
+void IntersectionUtil::updateIfGreater(glm::vec3 &first, const glm::vec3 &second) {
     if (second.x > first.x) {
-        res.x = second.x;
+        first.x = second.x;
     }
     if (second.y > first.y) {
-        res.y = second.y;
+        first.y = second.y;
     }
     if (second.z > first.z) {
-        res.z = second.z;
+        first.z = second.z;
     }
-    return res;
 }
 
 glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<glm::vec3 *> &mtvs, glm::vec3 direction) {
@@ -59,12 +55,12 @@ glm::vec3 *IntersectionUtil::getMostOppositeVec(std::vector<glm::vec3 *> &mtvs, 
 }
 
 glm::vec3 *
-IntersectionUtil::getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &firstTriangleNormal, AABB *aabb) {
+IntersectionUtil::getMinimumTranslationVec(glm::vec3 *firstTriangle, glm::vec3 &firstTriangleNormal, const AABB &aabb) {
     float minLength = INFINITY;
     for (int i = 0; i < 3; i++) {
         glm::vec3 &point = firstTriangle[i];
-        glm::vec3 toMin = aabb->getMin() - point;
-        glm::vec3 toMax = aabb->getMax() - point;
+        glm::vec3 toMin = aabb.getMin() - point;
+        glm::vec3 toMax = aabb.getMax() - point;
         float length = glm::dot(firstTriangleNormal, toMin);
         if (length < minLength) {
             minLength = length;

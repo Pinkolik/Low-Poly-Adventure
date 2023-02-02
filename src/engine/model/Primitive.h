@@ -16,30 +16,37 @@ public:
 
     void draw(Shader &shader) const;
 
-    std::vector<glm::vec3 *>
-    getMinimumTranslationVec(const glm::mat4 &transMat, const Primitive &other, const glm::mat4 &otherTransMat,
-                             const std::vector<AABB *> &otherAABBs) const;
+    std::vector<glm::vec3 *> getMinimumTranslationVec(const Primitive &other) const;
+
+    const AABB &getAabb() const;
 
     const Texture *getTexture() const;
 
     const std::vector<Vertex> &getVertices() const;
 
-    AABB calculateAABB(glm::mat4 transMat) const;
+    void calculateAABB();
+
+    void applyTranslation(glm::mat4 transMat);
+
+    void applyTranslationToAABB(glm::mat4 transMat);
+
 private:
 
     bool buffered = false;
+    Texture *texture = nullptr;
     unsigned int VAO = 0;
+
     std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
-    Texture *texture = nullptr;
+    AABB aabb;
 
-    void getTriangleVertices(int idx, const glm::mat4 &transMat, glm::vec3 *retVertices) const;
+    void getTriangleVertices(int idx, glm::vec3 *retVertices) const;
 
-    glm::vec3 getTriangleNormal(int idx, const glm::mat4 &transMat) const;
+    glm::vec3 getTriangleNormal(int idx) const;
 
-    glm::vec3 getMin(glm::mat4 transMat) const;
+    glm::vec3 getMin() const;
 
-    glm::vec3 getMax(glm::mat4 transMat) const;
+    glm::vec3 getMax() const;
 };
 
 #endif

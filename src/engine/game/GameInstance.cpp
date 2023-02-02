@@ -2,7 +2,6 @@
 // Created by pinkolik on 12/15/22.
 //
 
-#include <iostream>
 #include "GameInstance.h"
 #include "../intersection/IntersectionUtil.h"
 
@@ -66,6 +65,7 @@ bool GameInstance::processIntersectionWithMap(glm::vec3 move) {
         if (mtv != nullptr && glm::length(*mtv) >= 0.00001f) {
             player->applyForce(*mtv);
             wasApplied = true;
+//            std::cout << "Applying force: " << mtv->x << "," << mtv->y << "," << mtv->z << std::endl;
         } else {
             exit = true;
         }

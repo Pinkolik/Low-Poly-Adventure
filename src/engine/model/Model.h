@@ -13,13 +13,11 @@ class Model {
 public:
     explicit Model(const char *path);
 
-    void buffer();
-
     void draw(Shader &shader);
 
-    void setTranslation(glm::vec3 translation);
+    void translate(glm::vec3 translation);
 
-    void setScale(glm::vec3 scale);
+    void scale(glm::vec3 scale);
 
     std::vector<glm::vec3 *> getMinimumTranslationVec(Model &other) const;
 
@@ -29,8 +27,6 @@ private:
     std::vector<Node> nodes;
     std::vector<Mesh *> loadedMeshes;
     std::vector<Texture *> loadedTextures;
-
-    TransformationStruct transform;
 
     void load(const char *path);
 

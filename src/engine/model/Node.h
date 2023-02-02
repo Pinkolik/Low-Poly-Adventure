@@ -13,15 +13,11 @@ public:
     Node(std::vector<double> rotation, std::vector<double> scale,
          std::vector<double> translation, Mesh *mesh);
 
-    void buffer();
-
-    void draw(Shader &shader, glm::mat4 transMat);
+    void draw(Shader &shader, glm::mat4 transMat = glm::mat4(1));
 
     void addChild(Node &child);
 
-    void calculateAABBs(glm::mat4 transMat);
-
-    bool isAABBIntersecting(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const;
+    bool isAABBIntersecting(const Node &other) const;
 
     const Mesh *getMesh() const;
 
@@ -29,15 +25,25 @@ public:
 
     const std::vector<Node> &getChildren() const;
 
-    std::vector<glm::vec3 *>
-    getMinimumTranslationVec(glm::mat4 transMat, const Node &other, glm::mat4 otherTransMat) const;
+    std::vector<glm::vec3 *> getMinimumTranslationVec(const Node &other) const;
+
+    void translate(glm::vec3 translation);
+
+    void scale(glm::vec3 scale);
+
+    void init();
 
 private:
 
     Mesh *mesh = nullptr;
-    std::vector<AABB *> aabbs;
+
     TransformationStruct transform;
+
     std::vector<Node> children;
+
+    void init(glm::mat4 transMat);
+
+    void applyTranslation(glm::mat4 transMat, bool recalculateAABBs);
 
 };
 

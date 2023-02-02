@@ -12,15 +12,13 @@ Model::Model(const char *path) { load(path); }
 
 std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) const {
     std::vector<glm::vec3 *> res;
-    glm::mat4 transMat = ModelUtil::getTransMat(transform);
-    glm::mat4 otherTransMat = ModelUtil::getTransMat(other.transform);
     for (const auto &node: nodes) {
         for (const auto &otherNode: other.nodes) {
-            bool isAabbIntersecting = node.isAABBIntersecting(transMat, otherNode, otherTransMat);
+            bool isAabbIntersecting = node.isAABBIntersecting(otherNode);
             if (!isAabbIntersecting) {
                 continue;
             }
-            std::vector<glm::vec3 *> mtvs = node.getMinimumTranslationVec(transMat, otherNode, otherTransMat);
+            std::vector<glm::vec3 *> mtvs = node.getMinimumTranslationVec(otherNode);
             if (!mtvs.empty()) {
                 res.insert(res.end(), mtvs.begin(), mtvs.end());
             }
@@ -29,16 +27,9 @@ std::vector<glm::vec3 *> Model::getMinimumTranslationVec(Model &other) const {
     return res;
 }
 
-void Model::buffer() {
-    for (Node &node: nodes) {
-        node.buffer();
-    }
-}
-
 void Model::draw(Shader &shader) {
-    glm::mat4 transMat = ModelUtil::getTransMat(transform);
     for (Node &node: nodes) {
-        node.draw(shader, transMat);
+        node.draw(shader);
     }
 }
 
@@ -70,9 +61,8 @@ void Model::load(const char *path) {
         nodes.push_back(node);
     }
 
-    glm::mat4 transMat = glm::mat4(1);
     for (auto &node: nodes) {
-        node.calculateAABBs(transMat);
+        node.init();
     }
 }
 
@@ -98,7 +88,7 @@ Node Model::processNode(tinygltf::Model &gltfModel, tinygltf::Node &gltfNode) {
 Mesh *Model::processMesh(tinygltf::Model &gltfModel, int meshId) {
     for (auto &loadedMesh: loadedMeshes) {
         if (loadedMesh->getId() == meshId) {
-            return loadedMesh;
+            return new Mesh(*loadedMesh);
         }
     }
     tinygltf::Mesh &gltfMesh = gltfModel.meshes[meshId];
@@ -109,7 +99,7 @@ Mesh *Model::processMesh(tinygltf::Model &gltfModel, int meshId) {
     }
     Mesh *pMesh = new Mesh(meshId, primitives);
     loadedMeshes.push_back(pMesh);
-    return pMesh;
+    return new Mesh(*pMesh);
 }
 
 Primitive Model::processPrimitive(tinygltf::Model &gltfModel, tinygltf::Primitive &gltfPrimitive) {
@@ -187,11 +177,18 @@ Texture *Model::processTexture(tinygltf::Model &gltfModel,
     return tex;
 }
 
-void Model::setTranslation(glm::vec3 translation) {
-    transform.translation = translation;
+void Model::translate(glm::vec3 translation) {
+    for (auto &node: nodes) {
+        node.translate(translation);
+    }
 }
 
-void Model::setScale(glm::vec3 scale) { transform.scale = scale; }
+void Model::scale(glm::vec3 scale) {
+    glm::mat4 transMat = glm::scale(glm::mat4(1), scale);
+    for (auto &node: nodes) {
+        node.scale(scale);
+    }
+}
 
 const std::vector<Node> &Model::getNodes() const {
     return nodes;

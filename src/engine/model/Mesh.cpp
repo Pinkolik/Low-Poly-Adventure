@@ -1,6 +1,8 @@
 #include "Mesh.h"
 
-Mesh::Mesh(int id, std::vector<Primitive> &primitives) : id(id), primitives(primitives) {}
+Mesh::Mesh(int id, std::vector<Primitive> &primitives) : id(id), primitives(primitives) {
+    buffer();
+}
 
 const std::vector<Primitive> &Mesh::getPrimitives() const { return primitives; }
 
@@ -14,10 +16,20 @@ void Mesh::buffer() {
     }
 }
 
-std::vector<AABB *> Mesh::calculateAABBs(glm::mat4 transMat) {
-    std::vector<AABB *> res;
-    for (const auto &primitive: primitives) {
-        res.push_back(new AABB(primitive.calculateAABB(transMat)));
+void Mesh::applyTranslation(glm::mat4 transMat) {
+    for (auto &primitive: primitives) {
+        primitive.applyTranslation(transMat);
     }
-    return res;
+}
+
+void Mesh::applyTranslationToAABBs(glm::mat4 transMat) {
+    for (auto &primitive: primitives) {
+        primitive.applyTranslationToAABB(transMat);
+    }
+}
+
+void Mesh::calculateAABBs() {
+    for (auto &primitive: primitives) {
+        primitive.calculateAABB();
+    }
 }

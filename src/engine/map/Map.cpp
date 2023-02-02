@@ -2,7 +2,7 @@
 
 Map::Map(const char *mapModelPath) :
         model(Model(mapModelPath)) {
-    model.buffer();
+
 }
 
 Model &Map::getModel() {
