@@ -73,7 +73,7 @@ void processInput(GLFWwindow *window) {
 }
 
 void mainLoop(GLFWwindow *window) {
-    gameInstance = new GameInstance("resources/models/level_2/level_2.gltf", "resources/models/player/player.gltf",
+    gameInstance = new GameInstance("resources/models/level_1/level_1.gltf", "resources/models/player/player.gltf",
                                     width,
                                     height);
 
