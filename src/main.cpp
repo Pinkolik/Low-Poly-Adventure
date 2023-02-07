@@ -73,7 +73,7 @@ void processInput(GLFWwindow *window) {
 }
 
 void mainLoop(GLFWwindow *window) {
-    gameInstance = new GameInstance("resources/models/level_1/level_1.gltf", "resources/models/player/player.gltf",
+    gameInstance = new GameInstance("resources/models/level_2/level_2.gltf", "resources/models/player/player.gltf",
                                     width,
                                     height);
 
@@ -106,7 +106,7 @@ int main() {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         mainLoop(window);
     } catch (const std::exception &e) {

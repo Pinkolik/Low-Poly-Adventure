@@ -100,14 +100,6 @@ void Primitive::getTriangleVertices(int idx, glm::vec3 *retVertices) const {
     retVertices[2] = vertices[indices[idx + 2]].position;
 }
 
-glm::vec3 Primitive::getTriangleNormal(int idx) const {
-    return vertices[indices[idx]].normal;
-}
-
-const std::vector<Vertex> &Primitive::getVertices() const {
-    return vertices;
-}
-
 glm::vec3 Primitive::getMin() const {
     glm::vec3 min = glm::vec3(INFINITY, INFINITY, INFINITY);
     for (const auto &vertex: vertices) {

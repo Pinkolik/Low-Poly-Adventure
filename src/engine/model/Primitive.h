@@ -22,8 +22,6 @@ public:
 
     const Texture *getTexture() const;
 
-    const std::vector<Vertex> &getVertices() const;
-
     void calculateAABB();
 
     void applyTranslation(glm::mat4 transMat);
@@ -41,8 +39,6 @@ private:
     AABB aabb;
 
     void getTriangleVertices(int idx, glm::vec3 *retVertices) const;
-
-    glm::vec3 getTriangleNormal(int idx) const;
 
     glm::vec3 getMin() const;
 
