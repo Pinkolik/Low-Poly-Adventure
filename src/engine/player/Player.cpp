@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include <iostream>
+#include <iomanip>
 
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
@@ -67,6 +68,7 @@ Model &Player::getModel() {
 
 Player::Player(const char *playerModelPath, glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
         front(glm::vec3(0.0f, 0.0f, -1.0f)),
+        position(glm::vec3(0.0f)),
         movementSpeed(SPEED),
         mouseSensitivity(SENSITIVITY),
         worldUp(up),

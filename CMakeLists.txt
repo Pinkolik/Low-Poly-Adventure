@@ -44,7 +44,7 @@ add_executable(Game
         src/engine/intersection/AABB.h
         src/engine/game/GameInstance.cpp
         src/engine/game/GameInstance.h
-        )
+        src/engine/util/GLMLogger.cpp src/engine/util/GLMLogger.h)
 add_custom_command(
         TARGET Game POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
